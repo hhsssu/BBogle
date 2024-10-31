@@ -8,3 +8,6 @@
 
 # 4. .ipynb_checkpoints 
 .ipynb_checkpoints/
+
+# 5. 환경변수
+AI/variable.env
