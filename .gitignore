@@ -11,3 +11,6 @@
 
 # 5. 환경변수
 AI/variable.env
+
+# 6. access key & secret key
+*.env
