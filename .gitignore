@@ -14,3 +14,6 @@ AI/variable.env
 
 # 6. access key & secret key
 *.env
+
+# 7. 가상파일 무시
+*.virtual_documents
