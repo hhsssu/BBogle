@@ -14,3 +14,6 @@ AI/variable.env
 
 # 6. access key & secret key
 *.env
+
+backend/src/main/resources/application.yml
+/backend/src/main/resources/application.yml
