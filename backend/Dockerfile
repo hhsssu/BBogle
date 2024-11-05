@@ -1,4 +1,5 @@
-FROM amazoncorretto:17-alpine AS build
+# 빌드 스테이지
+FROM amazoncorretto:21-alpine AS build
 
 WORKDIR /app
 
@@ -8,13 +9,13 @@ COPY gradle ./gradle
 COPY src ./src
 RUN ./gradlew build --no-daemon
 
-# 빌드 결과물을 실행 이미지로 복사
-FROM amazoncorretto:17-alpine
+# 실행 스테이지
+FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 
-COPY --from=build /app/build/libs/safetycar-0.0.1-SNAPSHOT.jar /app/safetycar-0.0.1-SNAPSHOT.jar
+# 빌드 결과물 복사
+COPY --from=build /app/build/libs/bbogle-0.0.1-SNAPSHOT.jar /app/bbogle-0.0.1-SNAPSHOT.jar
 
-#EXPOSE 8080
-
-CMD ["java", "-jar", "/app/safetycar-0.0.1-SNAPSHOT.jar"]
+# 애플리케이션 실행
+CMD ["java", "-jar", "/app/bbogle-0.0.1-SNAPSHOT.jar"]

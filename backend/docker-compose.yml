@@ -1,13 +1,12 @@
 services:
   backend:
-    image: safetycar-dev-backend:latest
-    container_name: safetycar-dev-backend
+    image: bbogle-backend:latest
+    container_name: bbogle-backend
     networks:
       - backend-network
     # restart: unless-stopped
     expose:
       - "8080"
-      - "5432/udp" # udp
 
 networks:
   backend-network:
