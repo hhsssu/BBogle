@@ -74,6 +74,8 @@ pipeline {
         stage('Build') {
             steps {
                 dir('backend') {
+                    // gradlew에 실행 권한 추가
+                    sh 'chmod +x ./gradlew'
                     sh './gradlew clean build --no-daemon'  // JAR 파일 빌드
                 }
             }
@@ -88,3 +90,4 @@ pipeline {
         }
     }
 }
+
