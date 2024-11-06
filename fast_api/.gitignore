@@ -1,0 +1,22 @@
+# 1. git에 올리지 않은 파일 정의
+
+# 2. dataset
+/Dataset
+
+# 3. idea 파일
+.idea/
+
+# 4. .ipynb_checkpoints 
+.ipynb_checkpoints/
+
+# 5. 환경변수
+AI/variable.env
+
+# 6. access key & secret key
+*.env
+
+# 7. 가상파일 무시
+*.virtual_documents
+
+**/__pycache__/
+**/.venv/
