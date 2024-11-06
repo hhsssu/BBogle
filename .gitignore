@@ -17,3 +17,5 @@ AI/variable.env
 
 # 7. 가상파일 무시
 *.virtual_documents
+
+__pycache__/
