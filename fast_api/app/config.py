@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     AWS_SECRET_ACCESS_KEY: str
     
     # 데이터베이스 설정
-    DATABASE_URL: str
+    # DATABASE_URL: str
 
     class Config:
         # .env 파일의 절대 경로 설정
@@ -17,4 +17,4 @@ class Settings(BaseSettings):
 settings = Settings()
 
 # 설정값 출력
-print(f"Loaded DATABASE_URL: {settings.DATABASE_URL}")
+# print(f"Loaded DATABASE_URL: {settings.DATABASE_URL}")

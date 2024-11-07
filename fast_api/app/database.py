@@ -1,13 +1,21 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from .config import settings  # 환경변수나 설정값을 담고 있는 파일 (settings.DATABASE_URL을 불러온다고 가정)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from .config import settings
 
-# SQLAlchemy 엔진 및 세션 설정
-engine = create_engine(settings.DATABASE_URL)
+# 데이터베이스 URL 설정
+SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
+
+# 데이터베이스 엔진 생성
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+
+# 세션 팩토리 생성
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base 클래스 생성
 Base = declarative_base()
 
-# Dependency 함수로 DB 세션 제공
+# 데이터베이스 세션 의존성
 def get_db():
     db = SessionLocal()
     try:
