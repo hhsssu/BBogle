@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from typing import List
+from fastapi import FastAPI, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from .services.devlog_summary_service import DevLogSummaryService
 from .config import settings
@@ -42,18 +43,16 @@ summary_service = DevLogSummaryService(settings)
 
 ---
 요청 예시:
-{
-    "qna_list": [
-        {
-            "question": "오늘 수행한 작업은 무엇인가요?",
-            "answer": "사이드바 상태관리 수정과 공통 컴포넌트 구현"
-        },
-        {
-            "question": "어려웠던 점은 무엇인가요?",
-            "answer": "모달 컴포넌트 설계 시 고려사항이 많았음"
-        }
-    ]
-}
+[
+    {
+        "question": "오늘 수행한 작업은 무엇인가요?",
+        "answer": "사이드바 상태관리 수정과 공통 컴포넌트 구현"
+    },
+    {
+        "question": "어려웠던 점은 무엇인가요?",
+        "answer": "모달 컴포넌트 설계 시 고려사항이 많았음"
+    }
+]
 
 ---
 응답 예시:
@@ -67,11 +66,22 @@ summary_service = DevLogSummaryService(settings)
 - 빈 리스트는 허용되지 않습니다""",
     response_description="생성된 개발일지 제목"
 )
-async def summarize_devlog(request_data: dict):
-    logger.info("FAST API 호출을 명 받았습니다!")
+async def summarize_devlog(
+    qna_list: List[dict] = Body(  # 바로 리스트를 받도록 수정
+        example=[
+            {
+                "question": "1. 오늘의 목표는 무엇이었나요? 진행 상황을 공유해주세요.",
+                "answer": "1. Git 충돌 해결\n2. 코드 리팩토리 및 구조 최적화"
+            },
+            {
+                "question": "2. 진행하면서 어려운 점이 있었나요? 어떻게 해결했나요?",
+                "answer": "1. 깃 해결에 많은 시간을 쏟음\n2. 모델 반응 시간이 살짝 느림"
+            }
+        ]
+    )
+):
+    logger.info("개발일지 제목 생성 API 호출을 명 받았습니다!")
     try:
-        qna_list = request_data.get("qna_list", [])
-        
         if not qna_list:
             raise HTTPException(
                 status_code=400,
