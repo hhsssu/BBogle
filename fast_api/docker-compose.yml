@@ -3,7 +3,7 @@ services:
     image: ai-service:latest
     container_name: ai-service
     networks:
-      - backend-network
+      - back-network
 
     expose:
       - "8000"
