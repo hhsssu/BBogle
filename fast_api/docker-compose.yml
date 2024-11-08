@@ -1,0 +1,13 @@
+services:
+  festapi:
+    image: ai-service:latest
+    container_name: ai-service
+    networks:
+      - backend-network
+
+    expose:
+      - "8000"
+
+networks:
+  back-network:
+    external: true
