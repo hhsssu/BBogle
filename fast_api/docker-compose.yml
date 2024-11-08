@@ -1,7 +1,7 @@
 services:
   festapi:
-    image: ai-service:latest
-    container_name: ai-service
+    image: bbogle-ai:latest
+    container_name: bbogle-ai
     networks:
       - back-network
 
