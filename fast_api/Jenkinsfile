@@ -1,4 +1,4 @@
-pipeline{
+ pipeline{
     agent any
 
     stages {
@@ -23,7 +23,7 @@ pipeline{
         stage('Build Docker Image') {
             steps {
                 script {
-                     sh 'docker build -t ai-service:latest ./fast_api'
+                     sh 'docker build -t bbogle-ai:latest ./fast_api'
                 }
             }
         }
