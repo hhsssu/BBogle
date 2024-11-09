@@ -12,8 +12,6 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # COPY . /app
 COPY . .
-RUN ls /app  
-RUN ls /app/fast_api 
-RUN ls /app/fast_api/app 
+RUN ls -R /app 
 
 CMD ["python3", "fast_api/app/main.py"]
