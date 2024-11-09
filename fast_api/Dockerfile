@@ -10,6 +10,7 @@ RUN pip install --upgrade pip
 # RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY . /app
+# COPY . /app
+COPY . .
 
-CMD ["python3", "app/fast_api/app/main.py"]
+CMD ["python3", "fast_api/app/main.py"]
