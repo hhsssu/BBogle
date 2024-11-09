@@ -1,7 +1,7 @@
 FROM python:3.12.3-slim
 
 WORKDIR /app
-ENV PYTHONPATH=/app
+# ENV PYTHONPATH=/app
 
 COPY requirements.txt /app/requirements.txt
 
@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY . .
 RUN ls -R /app 
 
-CMD ["python3", "app/main.py"]
+CMD ["python3", "-m", "app/main.py"]
