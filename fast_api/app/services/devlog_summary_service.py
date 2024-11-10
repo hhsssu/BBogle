@@ -64,16 +64,16 @@ class DevLogSummaryService:
             return result["title"]
             
         except self.client.exceptions.ThrottlingException:
-            logger.error("요청이 너무 많습니다!")
+            logger.error("요청이 너무 많습니다. 잠시 후 다시 시도해주세요.")
             raise HTTPException(
                 status_code=429,
-                detail="잠시 후 다시 시도해주세요."
+                detail="요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
             )
         except Exception as e:
-            logger.error(f"요약 생성 중 에러 발생: {e}")
+            logger.error(f"서버에서 발생한 에러: {str(e)}")
             raise HTTPException(
                 status_code=500,
-                detail=str(e)
+                detail="서버에서 예기치 못한 에러가 발생했습니다."
             )
 
     def _create_prompt(self, qna_list: list) -> str:
