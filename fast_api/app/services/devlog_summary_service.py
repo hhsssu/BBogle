@@ -28,10 +28,13 @@ class DevLogSummaryService:
             self.model_id = "anthropic.claude-3-haiku-20240307-v1:0"
             logger.info("Bedrock 클라이언트 초기화 성공!")
             
+            # 세션과 클라이언트 설정이 성공적으로 완료되었는지 확인
+            logger.info(f"AWS 세션 설정 성공: {session}")
+            logger.info(f"Bedrock 클라이언트 설정 성공: {self.client}")
+            
         except Exception as e:
             logger.error(f"Bedrock 클라이언트 초기화 실패: {e}")
             raise
-
     async def generate_summary(self, qna_list: list) -> str:
         try:
             # QnA 리스트를 문자열로 변환하여 프롬프트 생성
