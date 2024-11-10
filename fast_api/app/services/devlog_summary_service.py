@@ -36,48 +36,56 @@ class DevLogSummaryService:
             logger.error(f"Bedrock 클라이언트 초기화 실패: {e}")
             raise
     async def generate_summary(self, qna_list: list) -> str:
-        try:
-            # QnA 리스트를 문자열로 변환하여 프롬프트 생성
-            prompt = self._create_prompt(qna_list)
-            
-            # 메시지 구성
-            messages = [
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ]
-            
-            # 요청 페이로드
-            payload = {
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 1000,
-                "messages": messages
-            }
-            
-            # 모델 호출
-            response = self.client.invoke_model(
-                modelId=self.model_id,
-                contentType="application/json",
-                accept="application/json",
-                body=json.dumps(payload)
-            )
-            
-            result = self._process_response(response)
-            return result["title"]
-            
-        except self.client.exceptions.ThrottlingException:
-            logger.error("요청이 너무 많습니다. 잠시 후 다시 시도해주세요.")
-            raise HTTPException(
-                status_code=429,
-                detail="요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
-            )
-        except Exception as e:
-            logger.error(f"서버에서 발생한 에러: {str(e)}")
+    try:
+        # AWS 클라이언트가 None인지 확인하는 로그
+        if not self.client:
+            logger.error("AWS 클라이언트가 제대로 초기화되지 않았습니다.")
             raise HTTPException(
                 status_code=500,
-                detail="서버에서 예기치 못한 에러가 발생했습니다."
+                detail="AWS 클라이언트 초기화 오류"
             )
+        
+        # QnA 리스트를 문자열로 변환하여 프롬프트 생성
+        prompt = self._create_prompt(qna_list)
+        
+        # 메시지 구성
+        messages = [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+        
+        # 요청 페이로드
+        payload = {
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": 1000,
+            "messages": messages
+        }
+        
+        # 모델 호출
+        response = self.client.invoke_model(
+            modelId=self.model_id,
+            contentType="application/json",
+            accept="application/json",
+            body=json.dumps(payload)
+        )
+        
+        result = self._process_response(response)
+        return result["title"]
+        
+    except self.client.exceptions.ThrottlingException:
+        logger.error("요청이 너무 많습니다. 잠시 후 다시 시도해주세요.")
+        raise HTTPException(
+            status_code=429,
+            detail="요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
+        )
+    except Exception as e:
+        logger.error(f"서버에서 발생한 에러: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="서버에서 예기치 못한 에러가 발생했습니다."
+        )
 
     def _create_prompt(self, qna_list: list) -> str:
         qna_text = "\n\n".join([
