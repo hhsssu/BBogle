@@ -16,7 +16,7 @@ app = FastAPI(
     title="개발일지 요약 서비스 API | ANSMOON 1.0.1",
     description="개발일지의 질문-답변들을 분석하여 적절한 제목을 생성하는 서비스입니다.",
     version="1.0.0",
-    docs_url="/docs",
+    docs_url="/ai/docs",
     redoc_url=None
 )
 
