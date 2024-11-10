@@ -23,7 +23,7 @@ app = FastAPI(
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://https://k11b102.p.ssafy.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,7 +32,7 @@ app.add_middleware(
 # 서비스 초기화
 summary_service = DevLogSummaryService(settings)
 
-@app.post("/api/summarize", 
+@app.post("/ai/summarize", 
     response_model=dict,
     summary="개발일지 제목 생성",
     description="""개발일지의 질문-답변 리스트를 받아 적절한 제목을 생성합니다.
