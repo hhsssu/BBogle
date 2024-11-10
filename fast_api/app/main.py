@@ -23,7 +23,7 @@ app = FastAPI(
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://k11b102.p.ssafy.io"],
+    allow_origins=["http://k11b102.p.ssafy.io"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
