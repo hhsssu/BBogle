@@ -19,10 +19,10 @@ app = FastAPI(
     title="개발일지 요약 및 경험 생성 서비스 API | ANSMOON 1.0.2",
     description="개발일지의 질문-답변을 분석하여 제목 및 회고 내용을 생성하고, 키워드 기반으로 경험을 추출하는 서비스입니다.",
     version="1.0.2",
-    docs_url="/ai/docs",
+    docs_url="/docs",
     redoc_url=None ,
-    openapi_url="/ai/openapi.json",  # OpenAPI 경로 명시
-    # root_path="/ai"  # 모든 경로에 /ai 접두사 추가
+    openapi_url="/openapi.json",  # OpenAPI 경로 명시
+    root_path="/ai"  # 모든 경로에 /ai 접두사 추가
 )
 
 # CORS 설정
