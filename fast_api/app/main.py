@@ -19,16 +19,16 @@ app = FastAPI(
     title="개발일지 요약 및 경험 생성 서비스 API | ANSMOON 1.0.2",
     description="개발일지의 질문-답변을 분석하여 제목 및 회고 내용을 생성하고, 키워드 기반으로 경험을 추출하는 서비스입니다.",
     version="1.0.2",
+    root_path="/ai"  # 모든 경로에 /ai 접두사 추가
     docs_url="/docs",
     redoc_url=None ,
     openapi_url="/openapi.json",  # OpenAPI 경로 명시
-    root_path="/ai"  # 모든 경로에 /ai 접두사 추가
+
 )
 
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-   # allow_origins=["http://k11b102.p.ssafy.io"],
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
@@ -41,7 +41,7 @@ retrospective_service = RetrospectiveService(settings)
 experience_service = ExperienceService(settings)
 
 @app.post(
-    "/ai/generate/title", 
+    "/generate/title", 
     response_model=dict,
     summary="개발일지 제목 생성",
     description="""개발일지의 질문-답변 리스트를 받아 적절한 제목을 생성합니다.
@@ -78,7 +78,7 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 
 
 @app.post(
-    "/ai/generate/summary",
+    "/generate/summary",
     response_model=dict,
     summary="개발일지 회고록 생성",
     description="""개발일지의 날짜별 상세 내용(질문 및 답변)을 받아 전체 프로젝트 회고록을 생성합니다.
@@ -115,7 +115,7 @@ async def generate_retrospective(request: List[dict] = Body(...)):
 
 
 @app.post(
-    "/ai/generate/experience",
+    "/generate/experience",
     response_model=dict,
     summary="경험 추출 생성",
     description="""회고 내용과 키워드를 기반으로 구체적이고 경험에 맞는 자기소개서 형식의 내용을 생성합니다.
@@ -152,6 +152,7 @@ async def generate_experience(
     except Exception as e:
         logger.error(f"경험 생성 중 오류 발생: {e}")
         raise HTTPException(status_code=500, detail="경험 생성 실패")
+        
 # 서버 실행
 if __name__ == '__main__':
     import uvicorn
