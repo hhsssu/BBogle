@@ -7,6 +7,12 @@ from .services.experience_service import ExperienceService
 from .config import settings
 import logging
 
+# 서버 실행
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=8000)
+
+
 # 로깅 설정
 logging.basicConfig(
     level=logging.INFO,
