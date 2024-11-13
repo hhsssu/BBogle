@@ -7,10 +7,6 @@ from .services.experience_service import ExperienceService
 from .config import settings
 import logging
 
-# 서버 실행
-if __name__ == '__main__':
-    import uvicorn
-    uvicorn.run("main:app", host='0.0.0.0', port=8000)
 
 # 로깅 설정
 logging.basicConfig(
@@ -154,3 +150,7 @@ async def generate_experience(
     except Exception as e:
         logger.error(f"경험 생성 중 오류 발생: {e}")
         raise HTTPException(status_code=500, detail="경험 생성 실패")
+# 서버 실행
+if __name__ == '__main__':
+    import uvicorn
+    uvicorn.run(app, host='0.0.0.0', port=8000)
