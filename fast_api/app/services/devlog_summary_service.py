@@ -28,12 +28,24 @@ class DevLogSummaryService:
             self.model_id = "anthropic.claude-3-haiku-20240307-v1:0"
             logger.info("Bedrock 클라이언트 초기화 성공!")
             
+            # 세션과 클라이언트 설정이 성공적으로 완료되었는지 확인
+            logger.info(f"AWS 세션 설정 성공: {session}")
+            logger.info(f"Bedrock 클라이언트 설정 성공: {self.client}")
+            
         except Exception as e:
             logger.error(f"Bedrock 클라이언트 초기화 실패: {e}")
             raise
 
     async def generate_summary(self, qna_list: list) -> str:
         try:
+            # AWS 클라이언트가 None인지 확인하는 로그
+            if not self.client:
+                logger.error("AWS 클라이언트가 제대로 초기화되지 않았습니다.")
+                raise HTTPException(
+                    status_code=500,
+                    detail="AWS 클라이언트 초기화 오류"
+                )
+            
             # QnA 리스트를 문자열로 변환하여 프롬프트 생성
             prompt = self._create_prompt(qna_list)
             
@@ -64,16 +76,16 @@ class DevLogSummaryService:
             return result["title"]
             
         except self.client.exceptions.ThrottlingException:
-            logger.error("요청이 너무 많습니다!")
+            logger.error("요청이 너무 많습니다. 잠시 후 다시 시도해주세요.")
             raise HTTPException(
                 status_code=429,
-                detail="잠시 후 다시 시도해주세요."
+                detail="요청이 너무 많습니다. 잠시 후 다시 시도해주세요."
             )
         except Exception as e:
-            logger.error(f"요약 생성 중 에러 발생: {e}")
+            logger.error(f"서버에서 발생한 에러: {str(e)}")
             raise HTTPException(
                 status_code=500,
-                detail=str(e)
+                detail="서버에서 예기치 못한 에러가 발생했습니다."
             )
 
     def _create_prompt(self, qna_list: list) -> str:
