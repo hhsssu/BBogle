@@ -21,7 +21,7 @@ app = FastAPI(
     version="1.0.2",
     docs_url="/ai/docs",
     redoc_url=None
-    // root_path="/ai"  # 모든 경로에 /ai 접두사 추가
+    # root_path="/ai"  # 모든 경로에 /ai 접두사 추가
 )
 
 # CORS 설정
