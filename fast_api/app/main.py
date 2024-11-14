@@ -6,9 +6,7 @@ from .services.retrospective_service import RetrospectiveService
 from .services.experience_service import ExperienceService
 from .config import settings
 import logging
-import pika
-import os
-import json
+
 
 # 로깅 설정
 logging.basicConfig(
@@ -42,65 +40,6 @@ summary_service = DevLogSummaryService(settings)
 retrospective_service = RetrospectiveService(settings)
 experience_service = ExperienceService(settings)
 
-# RabbitMQ 연결 설정
-connection_params = pika.ConnectionParameters(
-    host=settings.rabbitmq_host,
-    credentials=pika.PlainCredentials(settings.rabbitmq_user, settings.rabbitmq_pass)
-)
-
-@app.on_event("startup")
-def startup_event():
-    connection = pika.BlockingConnection(connection_params)
-    channel = connection.channel()
-    channel.queue_declare(queue='summaryQueue', durable=True)
-    channel.queue_declare(queue='retrospectiveQueue', durable=True)
-    channel.queue_declare(queue='experienceQueue', durable=True)
-    channel.queue_declare(queue='responseQueue', durable=True)
-
-    def callback(ch, method, properties, body):
-        message = json.loads(body.decode())
-        message_type = message.get("type")
-        message_data = message.get("data")
-
-        # 작업 타입에 따른 처리 분기
-        try:
-            if message_type == "summary":
-                logger.info("Summary 작업 처리 중")
-                result = summary_service.generate_summary_sync(message_data)
-                logger.info("Summary 작업 처리 완료")
-            elif message_type == "retrospective":
-                logger.info("Retrospective 작업 처리 중")
-                result = retrospective_service.generate_retrospective_sync(message_data)
-                logger.info("Retrospective 작업 처리 완료")
-            elif message_type == "experience":
-                logger.info("Experience 작업 처리 중")
-                result = experience_service.generate_experience_sync(message_data)
-                logger.info("Experience 작업 처리 완료")
-            else:
-                result = f"Unknown Type: {message_data}"
-                logger.warning("알 수 없는 작업 타입 요청")
-
-            # 결과를 응답 큐로 전송
-            response_channel = connection.channel()
-            response_channel.basic_publish(
-                exchange='',
-                routing_key=properties.reply_to,
-                properties=pika.BasicProperties(
-                    correlation_id=properties.correlation_id
-                ),
-                body=json.dumps(result)
-            )
-        except Exception as e:
-            logger.error(f"작업 처리 중 오류 발생: {e}")
-        finally:
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    # 각 큐에 대한 소비자 정의
-    channel.basic_consume(queue='summaryQueue', on_message_callback=callback)
-    channel.basic_consume(queue='retrospectiveQueue', on_message_callback=callback)
-    channel.basic_consume(queue='experienceQueue', on_message_callback=callback)
-    channel.start_consuming()
-
 @app.post(
     "/generate/title", 
     response_model=dict,
@@ -125,7 +64,6 @@ def startup_event():
 - 빈 리스트는 허용되지 않습니다.""",
     response_description="생성된 개발일지 제목"
 )
-
 async def summarize_devlog(qna_list: List[dict] = Body(...)):
     logger.info("개발일지 제목 생성 API 호출")
     try:
