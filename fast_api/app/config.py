@@ -16,12 +16,12 @@ class Settings(BaseSettings):
     # 데이터베이스 설정 (필요 시 추가)
     # DATABASE_URL: str
 
-    class Config:
-        # .env 파일의 절대 경로 설정
-        env_file = Path(__file__).parent.parent / ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"  # 정의되지 않은 필드 무시
-        allow_population_by_field_name = True  # alias 사용 가능
+    model_config = {
+        "env_file": str(Path(__file__).parent.parent / ".env"),
+        "env_file_encoding": "utf-8",
+        "extra": "ignore",  # 정의되지 않은 필드 무시
+        "populate_by_name": True  # alias 사용 가능
+    }
 
 settings = Settings()
 
