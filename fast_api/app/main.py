@@ -43,15 +43,9 @@ retrospective_service = RetrospectiveService(settings)
 experience_service = ExperienceService(settings)
 
 # RabbitMQ 연결 설정
-from dotenv import load_dotenv
-load_dotenv()
-RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
-RABBITMQ_USER = os.getenv("RABBITMQ_USER")
-RABBITMQ_PASS = os.getenv("RABBITMQ_PASS")
-
 connection_params = pika.ConnectionParameters(
-    host=RABBITMQ_HOST,
-    credentials=pika.PlainCredentials(RABBITMQ_USER, RABBITMQ_PASS)
+    host=settings.rabbitmq_host,
+    credentials=pika.PlainCredentials(settings.rabbitmq_user, settings.rabbitmq_pass)
 )
 
 @app.on_event("startup")
