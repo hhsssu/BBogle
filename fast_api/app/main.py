@@ -303,7 +303,7 @@ async def generate_retrospective(request: List[DailyLog]):
 
 @app.post(
     "/generate/experience",
-    response_model=dict,
+    response_model=ExperienceResponse,
     summary="경험 추출 생성",
     description="""회고 내용과 관련 키워드를 입력받아 개발 경험을 추출합니다.
 
