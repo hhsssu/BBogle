@@ -197,7 +197,7 @@ def on_experience_queue_message(ch, method, properties, body):
             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
 
         # experience_service를 사용하여 경험 생성
-        retrospective_content = data["data"].get("retrospective_content", "")
+        # retrospective_content = data["data"].get("retrospective_content", "")
 
         # 데이터 파싱
         # keywords = data["data"].get("keywords", [])
@@ -215,7 +215,7 @@ def on_experience_queue_message(ch, method, properties, body):
         # 응답 전송
         response = {
             "type": "experience_response",
-            "result": result
+            "result": result.dict() if hasattr(result, "dict") else result
         }
         ch.basic_publish(
             exchange='',
