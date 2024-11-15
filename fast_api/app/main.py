@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .services.devlog_summary_service import DevLogSummaryService
 from .services.retrospective_service import RetrospectiveService
 from .services.experience_service import ExperienceService
+from .schemas.retrospective_schema import DailyLog, RetrospectiveResponse
 from .config import settings
 import logging
 
@@ -75,7 +76,7 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 
 @app.post(
     "/api/generate/summary",
-    response_model=dict,
+    response_model=RetrospectiveResponse,
     summary="개발일지 회고록 생성",
     description="""개발일지의 날짜별 상세 내용(질문 및 답변)을 받아 전체 프로젝트 회고록을 생성합니다.
 
@@ -100,11 +101,10 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 """,
     response_description="생성된 프로젝트 회고록"
 )
-async def generate_retrospective(request: List[dict] = Body(...)):
-    logger.info("개발일지 회고록 생성 API 호출")
+async def generate_retrospective(request: List[DailyLog]):
     try:
         result = await retrospective_service.generate_retrospective(request)
-        return {"retrospective": result}
+        return RetrospectiveResponse(retrospective=result)
     except Exception as e:
         logger.error(f"회고록 생성 중 오류 발생: {e}")
         raise HTTPException(status_code=500, detail="회고록 생성 실패")
