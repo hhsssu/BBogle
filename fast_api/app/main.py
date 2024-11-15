@@ -198,8 +198,19 @@ def on_experience_queue_message(ch, method, properties, body):
 
         # experience_service를 사용하여 경험 생성
         retrospective_content = data["data"].get("retrospective_content", "")
-        keywords = data["data"].get("keywords", [])
-        result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # 서비스는 async 함수로 가정
+
+        # 데이터 파싱
+        # keywords = data["data"].get("keywords", [])
+        # result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # 서비스는 async 함수로 가정
+        retrospective_content = data["data"].get("retrospective_content", "")
+        keywords_data = data["data"].get("keywords", [])
+
+        # 키워드를 Pydantic 모델로 변환
+        from .schemas.experience_schema import Keyword as KeywordModel
+        keywords = [KeywordModel(**kw) for kw in keywords_data]
+
+        # experience_service를 사용하여 경험 생성
+        result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # async 함수로 가정
 
         # 응답 전송
         response = {
