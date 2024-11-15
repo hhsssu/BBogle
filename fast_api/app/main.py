@@ -9,6 +9,7 @@ import pika
 from .services.devlog_summary_service import DevLogSummaryService
 from .services.retrospective_service import RetrospectiveService
 from .services.experience_service import ExperienceService
+from .schemas.experience_schema import Keyword, ExperienceResponse, ExperienceRequest
 from .schemas.retrospective_schema import DailyLog, RetrospectiveResponse
 from .config import settings
 
@@ -243,7 +244,12 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
         return {"title": result}
     except Exception as e:
         logger.error(f"제목 생성 중 에러 발생 (HTTP): {e}")
-        raise
+
+        raise HTTPException(  #
+            status_code=500,
+            detail="제목 생성 중 오류가 발생했습니다."
+        )
+
 
 
 @app.post(
@@ -288,50 +294,80 @@ async def generate_retrospective(request: List[DailyLog]):
 
     except Exception as e:
         logger.error(f"회고록 생성 중 오류 발생 (HTTP): {e}")
-        raise HTTPException(status_code=500, detail="회고록 생성 실패")
+        raise HTTPException(status_code=500, detail="회고록 생성 중 오류가 발생했습니다.")
 
 
 @app.post(
     "/generate/experience",
     response_model=dict,
     summary="경험 추출 생성",
-    description="""회고 내용과 키워드를 기반으로 구체적이고 경험에 맞는 자기소개서 형식의 내용을 생성합니다.
+    description="""회고 내용과 관련 키워드를 입력받아 개발 경험을 추출합니다.
 
 입력/출력 형식
-- 입력: 회고 내용 (텍스트) 및 키워드 리스트 (콤마로 구분된 문자열)
-- 출력: 회고 내용을 바탕으로 키워드에 맞춘 경험 서술 (텍스트)
+- 입력: 회고 내용과 관련 키워드 목록
+- 출력: 추출된 경험 목록 (최대 4개, 각 경험은 제목, 내용, 매칭된 키워드 포함)
 
 요청 예시:
 {
-    "retrospective_content": "이번 프로젝트에서 다양한 성과를 거두었습니다. 특히 NLP 모델을 최적화하여...",
-    "keywords": "사용자 경험 개선, 코드 품질 향상, 최적화, 자동화"
+    "retrospective_content": "소셜로그인 기능 개발을 통해 사용자의 편의성과 보안성을 동시에 강화하는 경험을 했습니다...",
+    "keywords": [
+        {"id": 1, "name": "API"},
+        {"id": 2, "name": "보안"},
+        {"id": 3, "name": "성능"}
+    ]
 }
 
 응답 예시:
 {
-    "experience": "저는 NLP 모델의 성능 최적화를 담당했습니다. 이 과정에서 35% 성능 향상과..."
+    "experiences": [
+        {
+            "title": "OAuth2 기반 소셜 로그인 구현",
+            "content": "소셜로그인 기능 개발을 통해 사용자의 편의성과 보안성을 동시에 강화하는 경험을 했습니다...",
+            "keywords": [
+                {"id": 1, "name": "API"},
+                {"id": 2, "name": "보안"}
+            ]
+        }
+    ]
+
 }
 
 주의사항:
-- 각 경험은 독립적이며 구체적 수치를 포함해야 합니다.
-- 동일 키워드 내 내용 중복 및 추상적 서술을 피해주세요.
-""",
-    response_description="생성된 자기소개서 형식의 경험"
-)
-async def generate_experience(
-    retrospective_content: str = Body(..., example="회고 내용을 입력하세요"),
-    keywords: str = Body(..., example="사용자 경험 개선, 코드 품질 향상, 최적화")
-):
-    logger.info("경험 추출 생성 API 호출 (HTTP)")
+- 각 경험은 300-700자 내외로 작성됩니다.
+- 각 경험에는 반드시 구체적인 수치와 성과가 포함됩니다.
+- 키워드는 주어진 목록에서만 선택됩니다.
+""")
+async def generate_experience(request: ExperienceRequest):
     try:
-        if not retrospective_content or not keywords:
-            raise HTTPException(status_code=400, detail="회고 내용과 키워드를 모두 입력하세요.")
-        result = await experience_service.generate_experience(retrospective_content, keywords)
-        logger.info("경험 생성 성공 (HTTP)")
-        return {"experience": result}
+        logger.info(f"경험 추출 생성 API 호출 - 키워드 수: {len(request.keywords)}")
+
+        # 키워드 목록 검증
+        for keyword in request.keywords:
+            if not isinstance(keyword.id, int) or not isinstance(keyword.name, str):
+                raise ValueError("키워드의 'id'는 정수여야 하며, 'name'은 문자열이어야 합니다.")
+
+        # 키워드 중복 검사
+        keyword_ids = [keyword.id for keyword in request.keywords]
+        if len(set(keyword_ids)) != len(keyword_ids):
+            raise ValueError("키워드 목록에 중복된 ID가 있습니다.")
+        result = await experience_service.generate_experience(
+            request.retrospective_content,
+            request.keywords
+        )
+        logger.info(f"경험 추출 완료 - 추출된 경험 수: {len(result.experiences)}")
+        return result
+    except ValueError as e:
+        logger.error(f"경험 생성 중 오류 발생: {str(e)}")
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
     except Exception as e:
-        logger.error(f"경험 생성 중 오류 발생 (HTTP): {e}")
-        raise HTTPException(status_code=500, detail="경험 생성 실패")
+        logger.error(f"경험 생성 중 예상치 못한 오류 발생: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail="경험 생성 중 오류가 발생했습니다."
+        )
 
 
 # 서버 실행
