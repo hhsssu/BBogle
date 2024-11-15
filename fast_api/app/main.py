@@ -138,7 +138,7 @@ def on_retrospective_queue_message(ch, method, properties, body):
             "type": "retrospective_response",
             "result": result
         }
-        ch.basic_publish(
+        channel.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response),
