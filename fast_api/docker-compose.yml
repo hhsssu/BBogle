@@ -1,0 +1,13 @@
+services:
+  festapi:
+    image: bbogle-ai:latest
+    container_name: bbogle-ai
+    networks:
+      - back-network
+
+    expose:
+      - "8000"
+
+networks:
+  back-network:
+    external: true

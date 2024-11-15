@@ -26,7 +26,8 @@ app = FastAPI(
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+   # allow_origins=["http://k11b102.p.ssafy.io"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,7 +39,7 @@ retrospective_service = RetrospectiveService(settings)
 experience_service = ExperienceService(settings)
 
 @app.post(
-    "/api/generate/title", 
+    "/ai/generate/title", 
     response_model=dict,
     summary="개발일지 제목 생성",
     description="""개발일지의 질문-답변 리스트를 받아 적절한 제목을 생성합니다.
@@ -75,8 +76,13 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 
 
 @app.post(
+<<<<<<< HEAD
     "/api/generate/summary",
     response_model=RetrospectiveResponse,
+=======
+    "/ai/generate/summary",
+    response_model=dict,
+>>>>>>> 0ea19359214ddd1a7150bafe3a20a4fd8c19a746
     summary="개발일지 회고록 생성",
     description="""개발일지의 날짜별 상세 내용(질문 및 답변)을 받아 전체 프로젝트 회고록을 생성합니다.
 
@@ -111,7 +117,7 @@ async def generate_retrospective(request: List[DailyLog]):
 
 
 @app.post(
-    "/api/generate/experience",
+    "/ai/generate/experience",
     response_model=dict,
     summary="경험 추출 생성",
     description="""회고 내용과 키워드를 기반으로 구체적이고 경험에 맞는 자기소개서 형식의 내용을 생성합니다.

@@ -1,0 +1,73 @@
+ pipeline{
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Set .ENV File') {
+            steps {
+                dir('fast_api') {
+                    withCredentials([file(credentialsId: 'AI_ENV_FILE', variable: 'ai_env_file')]) {
+                        sh 'cp $ai_env_file ./.env'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                     sh 'docker build -t bbogle-ai:latest ./fast_api'
+                }
+            }
+        }
+        
+        stage('Depoly') {
+            steps {
+                dir ('fast_api') {
+                    script {
+                         sh 'docker-compose up -d'
+                    }
+                }
+            }
+        }
+        stage('Remove old Image') {
+            steps {
+                script {
+                    sh 'docker image prune -f'
+                }
+            }
+        }
+
+    }
+    // post {
+    //     success {
+    //         script {
+    //             def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+    //             def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+    //             mattermostSend (color: 'good',
+    //             message: "**윙 치킨 윙 치킨 AI 서버 빌드 성공** \n _backend_ \n ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)\n :white_check_mark: ",
+    //             endpoint: 'https://meeting.ssafy.com/hooks/tcx6yaicaffxufcujwc1qq8qsw',
+    //             channel: 'B102_Build'
+    //             )
+    //         }
+    //     }
+    //     failure {
+    //         script {
+    //             def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+    //             def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+    //             mattermostSend (color: 'danger',
+    //             message: "** LEGENDDDDDDDDDD BUILDDDDDDDD FAILEDDDDDDDDDD 빌드 실패** \n _backend_ \n ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}/console|Details>)\n :no_entry_sign: ",
+    //             endpoint: 'https://meeting.ssafy.com/hooks/tcx6yaicaffxufcujwc1qq8qsw',
+    //             channel: 'B102_Build'
+    //             )
+    //         }
+    //     }
+    // }
+}

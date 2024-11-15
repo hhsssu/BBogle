@@ -4,7 +4,7 @@
 /Dataset
 
 # 3. idea 파일
-.idea/
+.idea/*
 
 # 4. .ipynb_checkpoints 
 .ipynb_checkpoints/
