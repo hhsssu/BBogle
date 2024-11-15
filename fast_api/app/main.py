@@ -296,7 +296,13 @@ def on_retrospective_queue_message(ch, method, properties, body):
             "type": "retrospective_response",
             "result": result
         }
-        send_response("responseQueue", properties.correlation_id, response)
+        ch.basic_publish(
+            exchange='',
+            routing_key=properties.reply_to,
+            body=json.dumps(response),
+            properties=pika.BasicProperties(correlation_id=properties.correlation_id),
+        )
+        # send_response("responseQueue", properties.correlation_id, response)
         logger.info("retrospectiveQueue 응답 전송: %s", response)
     except Exception as e:
         logger.error(f"retrospectiveQueue 처리 중 오류 발생: {e}")
