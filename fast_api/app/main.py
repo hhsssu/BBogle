@@ -143,7 +143,7 @@ def on_retrospective_queue_message(ch, method, properties, body):
         ch.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
-            body=json.dumps(response),
+            body=json.dumps(response, ensure_ascii=False),
             properties=pika.BasicProperties(
                 correlation_id=properties.correlation_id,
                 content_type='application/json'
