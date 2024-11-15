@@ -253,7 +253,7 @@ def on_title_queue_message(ch, method, properties, body):
     """
     try:
         data = json.loads(body)
-        logger.info("summaryQueue 메시지 수신: %s", data)
+        logger.info("titleQueue 메시지 수신: %s", data)
         if not data.get("data"):
             raise ValueError("요약 생성에 필요한 데이터가 없습니다.")
 
@@ -265,7 +265,7 @@ def on_title_queue_message(ch, method, properties, body):
             "type": "title_response",
             "result": result
         }
-        channel.basic.publish(
+        channel.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response),
