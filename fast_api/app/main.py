@@ -76,13 +76,8 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 
 
 @app.post(
-<<<<<<< HEAD
     "/api/generate/summary",
     response_model=RetrospectiveResponse,
-=======
-    "/ai/generate/summary",
-    response_model=dict,
->>>>>>> 0ea19359214ddd1a7150bafe3a20a4fd8c19a746
     summary="개발일지 회고록 생성",
     description="""개발일지의 날짜별 상세 내용(질문 및 답변)을 받아 전체 프로젝트 회고록을 생성합니다.
 
