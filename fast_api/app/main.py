@@ -334,7 +334,7 @@ def on_experience_queue_message(ch, method, properties, body):
 
 # RabbitMQ 소비자 설정
 channel.basic_qos(prefetch_count=1)
-channel.basic_consume(queue='summaryQueue', on_message_callback=on_title_queue_message)
+channel.basic_consume(queue='titleQueue', on_message_callback=on_title_queue_message)
 channel.basic_consume(queue='retrospectiveQueue', on_message_callback=on_retrospective_queue_message)
 channel.basic_consume(queue='experienceQueue', on_message_callback=on_experience_queue_message)
 
