@@ -214,7 +214,7 @@ def on_experience_queue_message(ch, method, properties, body):
 
         # 응답 전송
         response = {
-            "type": "experience_response",
+            # "type": "experience_response",
             "result": result.dict() if hasattr(result, "dict") else result
         }
         ch.basic_publish(
