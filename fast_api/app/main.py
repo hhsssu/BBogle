@@ -247,9 +247,9 @@ def send_response(queue: str, correlation_id: str, response_body: dict):
 
 
 # 메시지 소비 함수들
-def on_summary_queue_message(ch, method, properties, body):
+def on_title_queue_message(ch, method, properties, body):
     """
-    summaryQueue에서 메시지를 소비하는 콜백 함수
+    titleQueue에서 메시지를 소비하는 콜백 함수
     """
     try:
         data = json.loads(body)
@@ -262,13 +262,18 @@ def on_summary_queue_message(ch, method, properties, body):
 
         # 응답 전송
         response = {
-            "type": "summary_response",
+            "type": "title_response",
             "result": result
         }
-        send_response("responseQueue", properties.correlation_id, response)
-        logger.info("summaryQueue 응답 전송: %s", response)
+        channel.basic.publish(
+            exchange='',
+            routing_key=properties.reply_to,
+            body=json.dumps(response),
+            properties=pika.BasicProperties(correlation_id=properties.correlation_id),
+        )
+        logger.info("titleQueue 응답 전송: %s", response)
     except Exception as e:
-        logger.error(f"summaryQueue 처리 중 오류 발생: {e}")
+        logger.error(f"titleQueue 처리 중 오류 발생: {e}")
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -357,7 +362,7 @@ def shutdown():
 # 기존 API 엔드포인트 복원 및 유지
 
 @app.post(
-    "/generate/title",
+        "/generate/title",
     response_model=dict,
     summary="개발일지 제목 생성",
     description="""개발일지의 질문-답변 리스트를 받아 적절한 제목을 생성합니다.
@@ -395,7 +400,7 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 
 @app.post(
     "/generate/summary",
-    response_model=RetrospectiveResponse, # 이거 바뀜
+    response_model=RetrospectiveResponse,
     summary="개발일지 회고록 생성",
     description="""개발일지의 날짜별 상세 내용(질문 및 답변)을 받아 전체 프로젝트 회고록을 생성합니다.
 
