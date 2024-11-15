@@ -108,7 +108,8 @@ def on_title_queue_message(ch, method, properties, body):
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response),
-            properties=pika.BasicProperties(correlation_id=properties.correlation_id),
+            properties=pika.BasicProperties(
+                correlation_id=properties.correlation_id),
         )
         logger.info("titleQueue 응답 전송: %s", response)
     except Exception as e:
@@ -139,11 +140,14 @@ def on_retrospective_queue_message(ch, method, properties, body):
             "type": "retrospective_response",
             "result": result
         }
-        channel.basic_publish(
+        ch.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response),
-            properties=pika.BasicProperties(correlation_id=properties.correlation_id),
+            properties=pika.BasicProperties(
+                correlation_id=properties.correlation_id,
+                content_type='application/json'
+            ),
         )
         # send_response("responseQueue", properties.correlation_id, response)
         logger.info("retrospectiveQueue 응답 전송: %s", response)
