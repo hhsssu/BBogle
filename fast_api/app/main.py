@@ -213,10 +213,11 @@ def on_experience_queue_message(ch, method, properties, body):
         result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # async 함수로 가정
 
         # 응답 전송
-        response = {
-            # "type": "experience_response",
-            "experiences": result.dict() if hasattr(result, "dict") else result
-        }
+        # response = {
+        #     # "type": "experience_response",
+        #     "experiences": result.dict() if hasattr(result, "dict") else result
+        # }
+        response = result.dict()
         ch.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
