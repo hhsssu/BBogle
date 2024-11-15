@@ -171,6 +171,7 @@ import pika
 from .services.devlog_summary_service import DevLogSummaryService
 from .services.retrospective_service import RetrospectiveService
 from .services.experience_service import ExperienceService
+from .schemas.retrospective_schema import DailyLog, RetrospectiveResponse
 from .config import settings
 
 # 로깅 설정
@@ -394,7 +395,7 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 
 @app.post(
     "/generate/summary",
-    response_model=dict,
+    response_model=RetrospectiveResponse, // 이거 바뀜
     summary="개발일지 회고록 생성",
     description="""개발일지의 날짜별 상세 내용(질문 및 답변)을 받아 전체 프로젝트 회고록을 생성합니다.
 
@@ -419,14 +420,19 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 """,
     response_description="생성된 프로젝트 회고록"
 )
-async def generate_retrospective(request: List[dict] = Body(...)):
+
+async def generate_retrospective(request: List[DailyLog]):
+# async def generate_retrospective(request: List[dict] = Body(...)):
     logger.info("개발일지 회고록 생성 API 호출 (HTTP)")
+
     try:
         if not request:
             raise HTTPException(status_code=400, detail="회고록 생성에 필요한 데이터가 없습니다.")
         result = await retrospective_service.generate_retrospective(request)
         logger.info("회고록 생성 성공 (HTTP)")
-        return {"retrospective": result}
+        return RetrospectiveResponse(retrospective=result)
+   #     return {"retrospective": result}
+
     except Exception as e:
         logger.error(f"회고록 생성 중 오류 발생 (HTTP): {e}")
         raise HTTPException(status_code=500, detail="회고록 생성 실패")

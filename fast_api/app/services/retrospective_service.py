@@ -2,8 +2,10 @@
 import boto3
 import json
 import logging
+from typing import List
 from botocore.config import Config
 from fastapi import HTTPException
+from ..schemas.retrospective_schema import DailyLog
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +25,7 @@ class RetrospectiveService:
             logger.error(f"Bedrock 클라이언트 초기화 실패: {e}")
             raise
 
-    async def generate_retrospective(self, dev_logs: list) -> str:
+    async def generate_retrospective(self, dev_logs: List[DailyLog]) -> str:
         try:
             # 프롬프트 생성
             prompt_parts = [
