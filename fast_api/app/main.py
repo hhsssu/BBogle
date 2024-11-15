@@ -133,11 +133,13 @@ def on_retrospective_queue_message(ch, method, properties, body):
         daily_logs = [DailyLog(**item) for item in data["data"]]
 
         # retrospective_service를 사용하여 회고록 생성
-        # result = asyncio.run(retrospective_service.generate_retrospective(data["data"]))  # 서비스는 async 함수로 가정
         result = asyncio.run(retrospective_service.generate_retrospective(daily_logs))  # 서비스는 async 함수로 가정
         # 응답 전송
+        # response = {
+        #     "type": "retrospective_response",
+        #     "result": result
+        # }
         response = {
-            "type": "retrospective_response",
             "result": result
         }
         ch.basic_publish(
@@ -157,6 +159,33 @@ def on_retrospective_queue_message(ch, method, properties, body):
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
+# def on_experience_queue_message(ch, method, properties, body):
+#     """
+#     experienceQueue에서 메시지를 소비하는 콜백 함수
+#     """
+#     try:
+#         data = json.loads(body)
+#         logger.info("experienceQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
+#
+#         # experience_service를 사용하여 경험 생성
+#         retrospective_content = data["data"].get("retrospective_content", "")
+#         keywords = data["data"].get("keywords", "")
+#         result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # 서비스는 async 함수로 가정
+#
+#         # 응답 전송
+#         response = {
+#             "type": "experience_response",
+#             "result": result
+#         }
+#         send_response("responseQueue", properties.correlation_id, response)
+#         logger.info("experienceQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
+
 def on_experience_queue_message(ch, method, properties, body):
     """
     experienceQueue에서 메시지를 소비하는 콜백 함수
@@ -169,7 +198,7 @@ def on_experience_queue_message(ch, method, properties, body):
 
         # experience_service를 사용하여 경험 생성
         retrospective_content = data["data"].get("retrospective_content", "")
-        keywords = data["data"].get("keywords", "")
+        keywords = data["data"].get("keywords", [])
         result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # 서비스는 async 함수로 가정
 
         # 응답 전송
@@ -177,7 +206,15 @@ def on_experience_queue_message(ch, method, properties, body):
             "type": "experience_response",
             "result": result
         }
-        send_response("responseQueue", properties.correlation_id, response)
+        ch.basic_publish(
+            exchange='',
+            routing_key=properties.reply_to,
+            body=json.dumps(response, ensure_ascii=False),
+            properties=pika.BasicProperties(
+                correlation_id=properties.correlation_id,
+                content_type='application/json'
+            ),
+        )
         logger.info("experienceQueue 응답 전송: %s", response)
     except Exception as e:
         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
