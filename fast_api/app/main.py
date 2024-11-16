@@ -240,8 +240,7 @@ def on_title_queue_message(ch, method, properties, body):
             routing_key=properties.reply_to,
             body=json.dumps(response),
             properties=pika.BasicProperties(
-                correlation_id=properties.correlation_id,
-                content_type='application/json'
+                correlation_id=properties.correlation_id
             ),
         )
         logger.info("titleQueue 응답 전송: %s", response)
@@ -287,7 +286,7 @@ def on_retrospective_queue_message(ch, method, properties, body):
         response = {
             "retrospective": result
         }
-        channel.basic_publish(
+        ch.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response, ensure_ascii=False),
@@ -341,7 +340,7 @@ def on_experience_queue_message(ch, method, properties, body):
 
         # 응답 전송
         response = result.dict()
-        channel.basic_publish(
+        ch.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response, ensure_ascii=False),
