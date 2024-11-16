@@ -12,6 +12,9 @@ from .services.experience_service import ExperienceService
 from .schemas.experience_schema import Keyword, ExperienceResponse, ExperienceRequest
 from .schemas.retrospective_schema import DailyLog, RetrospectiveResponse
 from .config import settings
+from botocore.exceptions import ClientError, BotoCoreError
+import time
+import random
 
 # 로깅 설정
 logging.basicConfig(
@@ -68,6 +71,9 @@ channel.queue_declare(queue='retrospectiveQueue', durable=True)
 channel.queue_declare(queue='experienceQueue', durable=True)
 channel.queue_declare(queue='responseQueue', durable=True)
 
+# 재시도 로직을 위한 설정
+MAX_RETRIES = 3
+BACKOFF_FACTOR = 1  # 초기 대기 시간 (초)
 
 def send_response(queue: str, correlation_id: str, response_body: dict):
     """
@@ -85,19 +91,144 @@ def send_response(queue: str, correlation_id: str, response_body: dict):
     )
 
 
-# 메시지 소비 함수들
+# # 메시지 소비 함수들
+# def on_title_queue_message(ch, method, properties, body):
+#     """
+#     titleQueue에서 메시지를 소비하는 콜백 함수
+#     """
+#     try:
+#         data = json.loads(body)
+#         logger.info("titleQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("요약 생성에 필요한 데이터가 없습니다.")
+#
+#         # summary_service를 사용하여 요약 생성
+#         result = asyncio.run(summary_service.generate_summary(data["data"]))  # 서비스는 async 함수로 가정
+#
+#         # 응답 전송
+#         response = {
+#             "type": "title_response",
+#             "result": result
+#         }
+#         channel.basic_publish(
+#             exchange='',
+#             routing_key=properties.reply_to,
+#             body=json.dumps(response),
+#             properties=pika.BasicProperties(
+#                 correlation_id=properties.correlation_id),
+#         )
+#         logger.info("titleQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"titleQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
+#
+#
+# def on_retrospective_queue_message(ch, method, properties, body):
+#     """
+#     retrospectiveQueue에서 메시지를 소비하는 콜백 함수
+#     """
+#     try:
+#         data = json.loads(body)
+#         logger.info("retrospectiveQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("회고록 생성에 필요한 데이터가 없습니다.")
+#
+#         # Pydantic 모델 변환
+#         # data["data"]는 List[dict] 형식이므로, 이를 List[DailyLog]로 변환합니다.
+#         daily_logs = [DailyLog(**item) for item in data["data"]]
+#
+#         # retrospective_service를 사용하여 회고록 생성
+#         result = asyncio.run(retrospective_service.generate_retrospective(daily_logs))  # 서비스는 async 함수로 가정
+#
+#         response = {
+#             "retrospective": result
+#         }
+#         ch.basic_publish(
+#             exchange='',
+#             routing_key=properties.reply_to,
+#             body=json.dumps(response, ensure_ascii=False),
+#             properties=pika.BasicProperties(
+#                 correlation_id=properties.correlation_id,
+#                 content_type='application/json'
+#             ),
+#         )
+#         logger.info("retrospectiveQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"retrospectiveQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
+#
+#
+# def on_experience_queue_message(ch, method, properties, body):
+#     """
+#     experienceQueue에서 메시지를 소비하는 콜백 함수
+#     """
+#     try:
+#         data = json.loads(body)
+#         logger.info("experienceQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
+#
+#         # 데이터 파싱
+#
+#         retrospective_content = data["data"].get("retrospective_content", "")
+#         keywords_data = data["data"].get("keywords", [])
+#
+#         # 키워드를 Pydantic 모델로 변환
+#         from .schemas.experience_schema import Keyword as KeywordModel
+#         keywords = [KeywordModel(**kw) for kw in keywords_data]
+#
+#         # experience_service를 사용하여 경험 생성
+#         result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # async 함수로 가정
+#
+#         # 응답 전송
+#         response = result.dict()
+#         ch.basic_publish(
+#             exchange='',
+#             routing_key=properties.reply_to,
+#             body=json.dumps(response, ensure_ascii=False),
+#             properties=pika.BasicProperties(
+#                 correlation_id=properties.correlation_id,
+#                 content_type='application/json'
+#             ),
+#         )
+#         logger.info("experienceQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
+
 def on_title_queue_message(ch, method, properties, body):
-    """
-    titleQueue에서 메시지를 소비하는 콜백 함수
-    """
     try:
         data = json.loads(body)
         logger.info("titleQueue 메시지 수신: %s", data)
         if not data.get("data"):
             raise ValueError("요약 생성에 필요한 데이터가 없습니다.")
 
-        # summary_service를 사용하여 요약 생성
-        result = asyncio.run(summary_service.generate_summary(data["data"]))  # 서비스는 async 함수로 가정
+        # 재시도 로직 추가
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                # summary_service를 사용하여 요약 생성
+                result = asyncio.run(summary_service.generate_summary(data["data"]))
+                break  # 성공하면 루프 탈출
+            except (ClientError, BotoCoreError) as e:
+                error_code = e.response['Error']['Code']
+                if error_code in ['ThrottlingException', 'ServiceUnavailableException']:
+                    if attempt < MAX_RETRIES:
+                        sleep_time = BACKOFF_FACTOR * (2 ** (attempt - 1)) + random.uniform(0, 1)
+                        logger.warning(f"{error_code} 발생. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
+                        time.sleep(sleep_time)
+                        continue
+                    else:
+                        logger.error(f"{error_code}로 인한 최대 재시도 횟수 초과.")
+                        raise
+                else:
+                    logger.error(f"AWS 호출 중 예기치 못한 오류 발생: {e}")
+                    raise
+            except Exception as e:
+                logger.error(f"titleQueue 처리 중 예기치 못한 오류 발생: {e}")
+                raise
 
         # 응답 전송
         response = {
@@ -109,7 +240,8 @@ def on_title_queue_message(ch, method, properties, body):
             routing_key=properties.reply_to,
             body=json.dumps(response),
             properties=pika.BasicProperties(
-                correlation_id=properties.correlation_id),
+                correlation_id=properties.correlation_id
+            ),
         )
         logger.info("titleQueue 응답 전송: %s", response)
     except Exception as e:
@@ -117,11 +249,7 @@ def on_title_queue_message(ch, method, properties, body):
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-
 def on_retrospective_queue_message(ch, method, properties, body):
-    """
-    retrospectiveQueue에서 메시지를 소비하는 콜백 함수
-    """
     try:
         data = json.loads(body)
         logger.info("retrospectiveQueue 메시지 수신: %s", data)
@@ -129,16 +257,32 @@ def on_retrospective_queue_message(ch, method, properties, body):
             raise ValueError("회고록 생성에 필요한 데이터가 없습니다.")
 
         # Pydantic 모델 변환
-        # data["data"]는 List[dict] 형식이므로, 이를 List[DailyLog]로 변환합니다.
         daily_logs = [DailyLog(**item) for item in data["data"]]
 
-        # retrospective_service를 사용하여 회고록 생성
-        result = asyncio.run(retrospective_service.generate_retrospective(daily_logs))  # 서비스는 async 함수로 가정
-        # 응답 전송
-        # response = {
-        #     "type": "retrospective_response",
-        #     "result": result
-        # }
+        # 재시도 로직 추가
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                # retrospective_service를 사용하여 회고록 생성
+                result = asyncio.run(retrospective_service.generate_retrospective(daily_logs))
+                break  # 성공하면 루프 탈출
+            except (ClientError, BotoCoreError) as e:
+                error_code = e.response['Error']['Code']
+                if error_code in ['ThrottlingException', 'ServiceUnavailableException']:
+                    if attempt < MAX_RETRIES:
+                        sleep_time = BACKOFF_FACTOR * (2 ** (attempt - 1)) + random.uniform(0, 1)
+                        logger.warning(f"{error_code} 발생. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
+                        time.sleep(sleep_time)
+                        continue
+                    else:
+                        logger.error(f"{error_code}로 인한 최대 재시도 횟수 초과.")
+                        raise
+                else:
+                    logger.error(f"AWS 호출 중 예기치 못한 오류 발생: {e}")
+                    raise
+            except Exception as e:
+                logger.error(f"retrospectiveQueue 처리 중 예기치 못한 오류 발생: {e}")
+                raise
+
         response = {
             "retrospective": result
         }
@@ -151,72 +295,50 @@ def on_retrospective_queue_message(ch, method, properties, body):
                 content_type='application/json'
             ),
         )
-        # send_response("responseQueue", properties.correlation_id, response)
         logger.info("retrospectiveQueue 응답 전송: %s", response)
     except Exception as e:
         logger.error(f"retrospectiveQueue 처리 중 오류 발생: {e}")
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-
-# def on_experience_queue_message(ch, method, properties, body):
-#     """
-#     experienceQueue에서 메시지를 소비하는 콜백 함수
-#     """
-#     try:
-#         data = json.loads(body)
-#         logger.info("experienceQueue 메시지 수신: %s", data)
-#         if not data.get("data"):
-#             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
-#
-#         # experience_service를 사용하여 경험 생성
-#         retrospective_content = data["data"].get("retrospective_content", "")
-#         keywords = data["data"].get("keywords", "")
-#         result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # 서비스는 async 함수로 가정
-#
-#         # 응답 전송
-#         response = {
-#             "type": "experience_response",
-#             "result": result
-#         }
-#         send_response("responseQueue", properties.correlation_id, response)
-#         logger.info("experienceQueue 응답 전송: %s", response)
-#     except Exception as e:
-#         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
-#     finally:
-#         ch.basic_ack(delivery_tag=method.delivery_tag)
-
 def on_experience_queue_message(ch, method, properties, body):
-    """
-    experienceQueue에서 메시지를 소비하는 콜백 함수
-    """
     try:
         data = json.loads(body)
         logger.info("experienceQueue 메시지 수신: %s", data)
         if not data.get("data"):
             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
 
-        # experience_service를 사용하여 경험 생성
-        # retrospective_content = data["data"].get("retrospective_content", "")
-
-        # 데이터 파싱
-        # keywords = data["data"].get("keywords", [])
-        # result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # 서비스는 async 함수로 가정
         retrospective_content = data["data"].get("retrospective_content", "")
         keywords_data = data["data"].get("keywords", [])
 
         # 키워드를 Pydantic 모델로 변환
-        from .schemas.experience_schema import Keyword as KeywordModel
-        keywords = [KeywordModel(**kw) for kw in keywords_data]
+        keywords = [Keyword(**kw) for kw in keywords_data]
 
-        # experience_service를 사용하여 경험 생성
-        result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))  # async 함수로 가정
+        # 재시도 로직 추가
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                # experience_service를 사용하여 경험 생성
+                result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))
+                break  # 성공하면 루프 탈출
+            except (ClientError, BotoCoreError) as e:
+                error_code = e.response['Error']['Code']
+                if error_code in ['ThrottlingException', 'ServiceUnavailableException']:
+                    if attempt < MAX_RETRIES:
+                        sleep_time = BACKOFF_FACTOR * (2 ** (attempt - 1)) + random.uniform(0, 1)
+                        logger.warning(f"{error_code} 발생. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
+                        time.sleep(sleep_time)
+                        continue
+                    else:
+                        logger.error(f"{error_code}로 인한 최대 재시도 횟수 초과.")
+                        raise
+                else:
+                    logger.error(f"AWS 호출 중 예기치 못한 오류 발생: {e}")
+                    raise
+            except Exception as e:
+                logger.error(f"experienceQueue 처리 중 예기치 못한 오류 발생: {e}")
+                raise
 
         # 응답 전송
-        # response = {
-        #     # "type": "experience_response",
-        #     "experiences": result.dict() if hasattr(result, "dict") else result
-        # }
         response = result.dict()
         ch.basic_publish(
             exchange='',
@@ -232,8 +354,6 @@ def on_experience_queue_message(ch, method, properties, body):
         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
-
-
 # RabbitMQ 소비자 설정
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(queue='titleQueue', on_message_callback=on_title_queue_message)
