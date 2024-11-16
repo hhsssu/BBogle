@@ -140,7 +140,7 @@ def on_retrospective_queue_message(ch, method, properties, body):
         #     "result": result
         # }
         response = {
-            "result": result
+            "retrospective": result
         }
         ch.basic_publish(
             exchange='',
