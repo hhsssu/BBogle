@@ -271,7 +271,7 @@ def shutdown():
     
 입력/출력 형식
 - 입력: 질문과 답변의 리스트 (JSON)
-- 출력: 50자 이내의 요약된 제목
+- 출력: 35자 이내의 요약된 제목
 
 요청 예시:
 [
@@ -297,7 +297,6 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
         return {"title": result}
     except Exception as e:
         logger.error(f"제목 생성 중 에러 발생 (HTTP): {e}")
-
         raise HTTPException(  #
             status_code=500,
             detail="제목 생성 중 오류가 발생했습니다."
@@ -334,20 +333,19 @@ async def summarize_devlog(qna_list: List[dict] = Body(...)):
 )
 
 async def generate_retrospective(request: List[DailyLog]):
-# async def generate_retrospective(request: List[dict] = Body(...)):
     logger.info("개발일지 회고록 생성 API 호출 (HTTP)")
-
     try:
         if not request:
             raise HTTPException(status_code=400, detail="회고록 생성에 필요한 데이터가 없습니다.")
         result = await retrospective_service.generate_retrospective(request)
         logger.info("회고록 생성 성공 (HTTP)")
         return RetrospectiveResponse(retrospective=result)
-   #     return {"retrospective": result}
-
     except Exception as e:
         logger.error(f"회고록 생성 중 오류 발생 (HTTP): {e}")
-        raise HTTPException(status_code=500, detail="회고록 생성 중 오류가 발생했습니다.")
+        raise HTTPException(
+            status_code=500,
+            detail="회고록 생성 중 오류가 발생했습니다."
+        )
 
 
 @app.post(
