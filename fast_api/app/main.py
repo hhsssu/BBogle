@@ -104,6 +104,9 @@ def should_retry(error):
         return False
 
 def execute_with_retry(func, *args, **kwargs):
+    """
+    재시도 로직을 처리하는 함수
+    """
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             return func(*args, **kwargs)
@@ -113,7 +116,6 @@ def execute_with_retry(func, *args, **kwargs):
                 sleep_time = calculate_sleep_time(attempt)
                 logger.warning(f"재시도할 예정입니다. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
                 time.sleep(sleep_time)
-                continue
             else:
                 logger.error(f"최대 재시도 횟수 초과 또는 재시도 불가 오류 발생: {e}")
                 raise
@@ -245,17 +247,17 @@ def send_response(queue: str, correlation_id: str, response_body: dict):
 #         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
 #     finally:
 #         ch.basic_ack(delivery_tag=method.delivery_tag)
-
 def on_title_queue_message(ch, method, properties, body):
     try:
-        data = json.loads(body)
+        data = json.loads(body)  # 메시지 본문을 JSON으로 디코드
         logger.info("titleQueue 메시지 수신: %s", data)
-        if not data.get("data"):
+        if not data.get("data"):  # 데이터 유효성 검사
             raise ValueError("요약 생성에 필요한 데이터가 없습니다.")
 
-     # 재시도 로직 적용
-        result = execute_with_retry(asyncio.run, summary_service.generate_summary(data["data"]))
-
+        # 매 재시도마다 새로운 코루틴 객체 생성
+        result = execute_with_retry(lambda: asyncio.run(
+            summary_service.generate_summary(data["data"])
+        ))
 
         # 응답 전송
         response = {
@@ -276,6 +278,37 @@ def on_title_queue_message(ch, method, properties, body):
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
+# def on_title_queue_message(ch, method, properties, body):
+#     try:
+#         data = json.loads(body)
+#         logger.info("titleQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("요약 생성에 필요한 데이터가 없습니다.")
+
+#      # 재시도 로직 적용
+#         result = execute_with_retry(asyncio.run, summary_service.generate_summary(data["data"]))
+
+
+#         # 응답 전송
+#         response = {
+#             "type": "title_response",
+#             "result": result
+#         }
+#         channel.basic_publish(
+#             exchange='',
+#             routing_key=properties.reply_to,
+#             body=json.dumps(response),
+#             properties=pika.BasicProperties(
+#                 correlation_id=properties.correlation_id
+#             ),
+#         )
+#         logger.info("titleQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"titleQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
+
+
 def on_retrospective_queue_message(ch, method, properties, body):
     try:
         data = json.loads(body)
@@ -286,14 +319,18 @@ def on_retrospective_queue_message(ch, method, properties, body):
         # Pydantic 모델 변환
         daily_logs = [DailyLog(**item) for item in data["data"]]
 
-   # 재시도 로직 적용
-        result = execute_with_retry(asyncio.run, retrospective_service.generate_retrospective(daily_logs))
+        # 비동기 작업 실행
+        async def generate_retrospective_task():
+            return await retrospective_service.generate_retrospective(daily_logs)
 
+        # 매 재시도마다 새로운 코루틴 객체 생성
+        result = execute_with_retry(lambda: asyncio.run(generate_retrospective_task()))
 
+        # 응답 전송
         response = {
             "retrospective": result
         }
-        ch.basic_publish(
+        channel.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response, ensure_ascii=False),
@@ -308,12 +345,11 @@ def on_retrospective_queue_message(ch, method, properties, body):
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
-# experienceQueue에서 사용하는 콜백 함수
 def on_experience_queue_message(ch, method, properties, body):
     try:
-        data = json.loads(body)
+        data = json.loads(body)  # 메시지 본문을 JSON으로 디코드
         logger.info("experienceQueue 메시지 수신: %s", data)
-        if not data.get("data"):
+        if not data.get("data"):  # 데이터 유효성 검사
             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
 
         retrospective_content = data["data"].get("retrospective_content", "")
@@ -322,11 +358,10 @@ def on_experience_queue_message(ch, method, properties, body):
         # 키워드를 Pydantic 모델로 변환
         keywords = [Keyword(**kw) for kw in keywords_data]
 
-        # 재시도 로직 외부에서 asyncio.run 호출
-        async def generate_experience_task():
-            return await experience_service.generate_experience(retrospective_content, keywords)
-
-        result = execute_with_retry(asyncio.run, generate_experience_task())
+        # 매 재시도마다 새로운 코루틴 객체 생성
+        result = execute_with_retry(lambda: asyncio.run(
+            experience_service.generate_experience(retrospective_content, keywords)
+        ))
 
         # 응답 전송
         response = result.dict()
@@ -344,6 +379,78 @@ def on_experience_queue_message(ch, method, properties, body):
         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
+
+
+# def on_retrospective_queue_message(ch, method, properties, body):
+#     try:
+#         data = json.loads(body)
+#         logger.info("retrospectiveQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("회고록 생성에 필요한 데이터가 없습니다.")
+
+#         # Pydantic 모델 변환
+#         daily_logs = [DailyLog(**item) for item in data["data"]]
+
+#    # 재시도 로직 적용
+#         result = execute_with_retry(asyncio.run, retrospective_service.generate_retrospective(daily_logs))
+
+
+#         response = {
+#             "retrospective": result
+#         }
+#         ch.basic_publish(
+#             exchange='',
+#             routing_key=properties.reply_to,
+#             body=json.dumps(response, ensure_ascii=False),
+#             properties=pika.BasicProperties(
+#                 correlation_id=properties.correlation_id,
+#                 content_type='application/json'
+#             ),
+#         )
+#         logger.info("retrospectiveQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"retrospectiveQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
+
+
+
+# # experienceQueue에서 사용하는 콜백 함수
+# def on_experience_queue_message(ch, method, properties, body):
+#     try:
+#         data = json.loads(body)
+#         logger.info("experienceQueue 메시지 수신: %s", data)
+#         if not data.get("data"):
+#             raise ValueError("경험 생성에 필요한 데이터가 없습니다.")
+
+#         retrospective_content = data["data"].get("retrospective_content", "")
+#         keywords_data = data["data"].get("keywords", [])
+
+#         # 키워드를 Pydantic 모델로 변환
+#         keywords = [Keyword(**kw) for kw in keywords_data]
+
+#         # 재시도 로직 외부에서 asyncio.run 호출
+#         async def generate_experience_task():
+#             return await experience_service.generate_experience(retrospective_content, keywords)
+
+#         result = execute_with_retry(asyncio.run, generate_experience_task())
+
+#         # 응답 전송
+#         response = result.dict()
+#         channel.basic_publish(
+#             exchange='',
+#             routing_key=properties.reply_to,
+#             body=json.dumps(response, ensure_ascii=False),
+#             properties=pika.BasicProperties(
+#                 correlation_id=properties.correlation_id,
+#                 content_type='application/json'
+#             ),
+#         )
+#         logger.info("experienceQueue 응답 전송: %s", response)
+#     except Exception as e:
+#         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
+#     finally:
+#         ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 
