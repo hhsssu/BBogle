@@ -85,6 +85,15 @@ MAX_RETRIES = 5
 BACKOFF_FACTOR = 2  # 초기 대기 시간 (초)
 MAX_BACKOFF = 60    # 최대 대기 시간 (초)
 
+def calculate_sleep_time(attempt: int) -> float:
+    """
+    재시도 대기 시간을 계산하는 함수
+    - 초기 대기 시간(BACKOFF_FACTOR)에 지수 증가를 적용
+    - 최대 대기 시간(MAX_BACKOFF)을 초과하지 않도록 제한
+    """
+    sleep_time = min(BACKOFF_FACTOR * (2 ** (attempt - 1)), MAX_BACKOFF)
+    return sleep_time
+
 def should_retry(error):
     error_message = str(error)
     if 'ThrottlingException' in error_message or 'TooManyRequestsException' in error_message:
