@@ -69,7 +69,7 @@ connection_parameters = pika.ConnectionParameters(
     port=rabbitmq_port,
     credentials=pika.PlainCredentials(rabbitmq_user, rabbitmq_pass),
     heartbeat=600,  # heartbeat 설정 (초 단위)
-    blocked_connection_timeout=300,
+    blocked_connection_timeout=500,
 )
 connection = pika.BlockingConnection(connection_parameters)
 channel = connection.channel()
