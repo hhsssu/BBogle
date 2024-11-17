@@ -6,6 +6,7 @@ import json
 import logging
 import pika
 
+from dotenv import load_dotenv
 from .services.devlog_summary_service import DevLogSummaryService
 from .services.retrospective_service import RetrospectiveService
 from .services.experience_service import ExperienceService
@@ -15,6 +16,9 @@ from .config import settings
 from botocore.exceptions import ClientError, BotoCoreError
 import time
 import random
+
+# .env 파일에서 환경 변수 로드
+load_dotenv()
 
 # 로깅 설정
 logging.basicConfig(
@@ -48,11 +52,17 @@ retrospective_service = RetrospectiveService(settings)
 experience_service = ExperienceService(settings)
 
 # RabbitMQ 연결 정보
-rabbitmq_user = "bbogle"
-rabbitmq_pass = "ayebimil"
-rabbitmq_host = "bbogle-rabbitmq"  # Docker 컨테이너 이름 또는 호스트
-rabbitmq_port = 5672
-rabbitmq_exchange = ""
+# rabbitmq_user = "bbogle"
+# rabbitmq_pass = "ayebimil"
+# rabbitmq_host = "bbogle-rabbitmq"  # Docker 컨테이너 이름 또는 호스트
+# rabbitmq_port = 5672
+# rabbitmq_exchange = ""
+rabbitmq_user = os.getenv("RABBITMQ_USER", "guest")
+rabbitmq_pass = os.getenv("RABBITMQ_PASS", "guest")
+rabbitmq_host = os.getenv("RABBITMQ_HOST", "localhost")
+rabbitmq_port = int(os.getenv("RABBITMQ_PORT", "5672"))
+rabbitmq_exchange = os.getenv("RABBITMQ_EXCHANGE", "")
+
 
 # RabbitMQ 연결 및 채널 설정
 connection_parameters = pika.ConnectionParameters(
@@ -72,8 +82,37 @@ channel.queue_declare(queue='experienceQueue', durable=True)
 channel.queue_declare(queue='responseQueue', durable=True)
 
 # 재시도 로직을 위한 설정
-MAX_RETRIES = 3
-BACKOFF_FACTOR = 1  # 초기 대기 시간 (초)
+MAX_RETRIES = 5
+BACKOFF_FACTOR = 2  # 초기 대기 시간 (초)
+MAX_BACKOFF = 60    # 최대 대기 시간 (초)
+
+def should_retry(error):
+    error_message = str(error)
+    if 'ThrottlingException' in error_message or 'TooManyRequestsException' in error_message:
+        return True
+    elif '500' in error_message or '429' in error_message:
+        return True
+    else:
+        return False
+
+def execute_with_retry(func, *args, **kwargs):
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logger.error(f"예외 발생: {type(e)} - {e}")
+            if should_retry(e) and attempt < MAX_RETRIES:
+                sleep_time = calculate_sleep_time(attempt)
+                logger.warning(f"재시도할 예정입니다. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
+                time.sleep(sleep_time)
+                continue
+            else:
+                logger.error(f"최대 재시도 횟수 초과 또는 재시도 불가 오류 발생: {e}")
+                raise
+
+
+
+
 
 def send_response(queue: str, correlation_id: str, response_body: dict):
     """
@@ -206,29 +245,9 @@ def on_title_queue_message(ch, method, properties, body):
         if not data.get("data"):
             raise ValueError("요약 생성에 필요한 데이터가 없습니다.")
 
-        # 재시도 로직 추가
-        for attempt in range(1, MAX_RETRIES + 1):
-            try:
-                # summary_service를 사용하여 요약 생성
-                result = asyncio.run(summary_service.generate_summary(data["data"]))
-                break  # 성공하면 루프 탈출
-            except (ClientError, BotoCoreError) as e:
-                error_code = e.response['Error']['Code']
-                if error_code in ['ThrottlingException', 'ServiceUnavailableException']:
-                    if attempt < MAX_RETRIES:
-                        sleep_time = BACKOFF_FACTOR * (2 ** (attempt - 1)) + random.uniform(0, 1)
-                        logger.warning(f"{error_code} 발생. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
-                        time.sleep(sleep_time)
-                        continue
-                    else:
-                        logger.error(f"{error_code}로 인한 최대 재시도 횟수 초과.")
-                        raise
-                else:
-                    logger.error(f"AWS 호출 중 예기치 못한 오류 발생: {e}")
-                    raise
-            except Exception as e:
-                logger.error(f"titleQueue 처리 중 예기치 못한 오류 발생: {e}")
-                raise
+     # 재시도 로직 적용
+        result = execute_with_retry(asyncio.run, summary_service.generate_summary(data["data"]))
+
 
         # 응답 전송
         response = {
@@ -259,29 +278,9 @@ def on_retrospective_queue_message(ch, method, properties, body):
         # Pydantic 모델 변환
         daily_logs = [DailyLog(**item) for item in data["data"]]
 
-        # 재시도 로직 추가
-        for attempt in range(1, MAX_RETRIES + 1):
-            try:
-                # retrospective_service를 사용하여 회고록 생성
-                result = asyncio.run(retrospective_service.generate_retrospective(daily_logs))
-                break  # 성공하면 루프 탈출
-            except (ClientError, BotoCoreError) as e:
-                error_code = e.response['Error']['Code']
-                if error_code in ['ThrottlingException', 'ServiceUnavailableException']:
-                    if attempt < MAX_RETRIES:
-                        sleep_time = BACKOFF_FACTOR * (2 ** (attempt - 1)) + random.uniform(0, 1)
-                        logger.warning(f"{error_code} 발생. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
-                        time.sleep(sleep_time)
-                        continue
-                    else:
-                        logger.error(f"{error_code}로 인한 최대 재시도 횟수 초과.")
-                        raise
-                else:
-                    logger.error(f"AWS 호출 중 예기치 못한 오류 발생: {e}")
-                    raise
-            except Exception as e:
-                logger.error(f"retrospectiveQueue 처리 중 예기치 못한 오류 발생: {e}")
-                raise
+   # 재시도 로직 적용
+        result = execute_with_retry(asyncio.run, retrospective_service.generate_retrospective(daily_logs))
+
 
         response = {
             "retrospective": result
@@ -314,29 +313,9 @@ def on_experience_queue_message(ch, method, properties, body):
         # 키워드를 Pydantic 모델로 변환
         keywords = [Keyword(**kw) for kw in keywords_data]
 
-        # 재시도 로직 추가
-        for attempt in range(1, MAX_RETRIES + 1):
-            try:
-                # experience_service를 사용하여 경험 생성
-                result = asyncio.run(experience_service.generate_experience(retrospective_content, keywords))
-                break  # 성공하면 루프 탈출
-            except (ClientError, BotoCoreError) as e:
-                error_code = e.response['Error']['Code']
-                if error_code in ['ThrottlingException', 'ServiceUnavailableException']:
-                    if attempt < MAX_RETRIES:
-                        sleep_time = BACKOFF_FACTOR * (2 ** (attempt - 1)) + random.uniform(0, 1)
-                        logger.warning(f"{error_code} 발생. {sleep_time:.2f}초 후 재시도합니다. (시도 횟수: {attempt}/{MAX_RETRIES})")
-                        time.sleep(sleep_time)
-                        continue
-                    else:
-                        logger.error(f"{error_code}로 인한 최대 재시도 횟수 초과.")
-                        raise
-                else:
-                    logger.error(f"AWS 호출 중 예기치 못한 오류 발생: {e}")
-                    raise
-            except Exception as e:
-                logger.error(f"experienceQueue 처리 중 예기치 못한 오류 발생: {e}")
-                raise
+         # 재시도 로직 적용
+        result = execute_with_retry(asyncio.run, experience_service.generate_experience, retrospective_content, keywords)
+
 
         # 응답 전송
         response = result.dict()
