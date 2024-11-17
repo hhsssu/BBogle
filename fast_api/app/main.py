@@ -299,6 +299,7 @@ def on_retrospective_queue_message(ch, method, properties, body):
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
+# experienceQueue에서 사용하는 콜백 함수
 def on_experience_queue_message(ch, method, properties, body):
     try:
         data = json.loads(body)
@@ -312,13 +313,15 @@ def on_experience_queue_message(ch, method, properties, body):
         # 키워드를 Pydantic 모델로 변환
         keywords = [Keyword(**kw) for kw in keywords_data]
 
-         # 재시도 로직 적용
-        result = execute_with_retry(asyncio.run, experience_service.generate_experience, retrospective_content, keywords)
+        # 재시도 로직 외부에서 asyncio.run 호출
+        async def generate_experience_task():
+            return await experience_service.generate_experience(retrospective_content, keywords)
 
+        result = execute_with_retry(asyncio.run, generate_experience_task())
 
         # 응답 전송
         response = result.dict()
-        ch.basic_publish(
+        channel.basic_publish(
             exchange='',
             routing_key=properties.reply_to,
             body=json.dumps(response, ensure_ascii=False),
@@ -332,6 +335,10 @@ def on_experience_queue_message(ch, method, properties, body):
         logger.error(f"experienceQueue 처리 중 오류 발생: {e}")
     finally:
         ch.basic_ack(delivery_tag=method.delivery_tag)
+
+
+
+
 # RabbitMQ 소비자 설정
 channel.basic_qos(prefetch_count=1)
 channel.basic_consume(queue='titleQueue', on_message_callback=on_title_queue_message)
