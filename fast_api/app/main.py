@@ -57,12 +57,11 @@ experience_service = ExperienceService(settings)
 # rabbitmq_host = "bbogle-rabbitmq"  # Docker 컨테이너 이름 또는 호스트
 # rabbitmq_port = 5672
 # rabbitmq_exchange = ""
-rabbitmq_user = os.getenv("RABBITMQ_USER", "guest")
-rabbitmq_pass = os.getenv("RABBITMQ_PASS", "guest")
-rabbitmq_host = os.getenv("RABBITMQ_HOST", "localhost")
-rabbitmq_port = int(os.getenv("RABBITMQ_PORT", "5672"))
-rabbitmq_exchange = os.getenv("RABBITMQ_EXCHANGE", "")
-
+rabbitmq_user = settings.RABBITMQ_USER
+rabbitmq_pass = settings.RABBITMQ_PASS
+rabbitmq_host = settings.RABBITMQ_HOST
+rabbitmq_port = settings.RABBITMQ_PORT
+rabbitmq_exchange = settings.RABBITMQ_EXCHANGE
 
 # RabbitMQ 연결 및 채널 설정
 connection_parameters = pika.ConnectionParameters(

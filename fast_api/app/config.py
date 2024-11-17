@@ -10,6 +10,13 @@ class Settings(BaseSettings):
     # 데이터베이스 설정
     # DATABASE_URL: str
 
+    # RabbitMQ 설정
+    RABBITMQ_USER: str
+    RABBITMQ_PASS: str
+    RABBITMQ_HOST: str
+    RABBITMQ_PORT: int
+    RABBITMQ_EXCHANGE: str = ""
+    
     class Config:
         # .env 파일의 절대 경로 설정
         env_file = Path(__file__).parent.parent / ".env"
