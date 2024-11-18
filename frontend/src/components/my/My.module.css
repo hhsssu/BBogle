@@ -1,0 +1,242 @@
+.container {
+  padding: 8vh 7vw;
+}
+
+.infoContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 8vh;
+}
+
+.infoContainer > :nth-child(1) {
+  width: 200px;
+  height: 200px;
+  aspect-ratio: 1 / 1;
+  margin-right: 36px;
+  cursor: pointer;
+}
+
+.greeting {
+  display: flex;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.edit {
+  margin-bottom: 10px;
+}
+
+.edit > div {
+  display: flex;
+  align-items: center;
+}
+
+.editIcon {
+  cursor: pointer;
+}
+
+.edit > div > img {
+  margin-left: 8px;
+  width: 14px;
+  cursor: pointer;
+}
+
+.editDesc {
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.editInput {
+  background-color: #e8e8e8;
+  padding: 5px 10px 7px 10px;
+  border-radius: 12px;
+  border: none;
+}
+
+.name {
+  margin-right: 6px;
+}
+
+.name > span {
+  background-color: #e8e8e870;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-right: 2px;
+}
+
+.cheer {
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.email {
+  font-size: 12px;
+  background-color: #e8e8e870;
+  display: inline;
+  padding: 6px 16px;
+  border-radius: 16px;
+  color: #444444;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.highlight {
+  color: #ff5c17;
+}
+
+.pjtList {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 2.1rem;
+  padding-left: 0.1rem;
+  padding: 12px 8px;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+}
+
+.guide {
+  display: flex;
+  margin: 0 auto 30px auto;
+}
+
+.guide > img {
+  width: 100px;
+  margin-right: 24px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.message > div:nth-child(1) {
+  color: #a0a0a0;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.message > div:nth-child(2) {
+  color: #a0a0a0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: white;
+  padding: 20px;
+  border-radius: 24px;
+  width: 80%;
+  max-width: 500px;
+  position: relative;
+}
+
+/* 알람 허용 Card */
+.permission {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 312px;
+  background-color: #f3f3f387;
+  padding: 30px;
+  border-radius: 20px;
+}
+
+/* 현재 권한 상태 */
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.icon {
+  margin-right: 10px;
+}
+
+.alarmGuide {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.guideDetail {
+  font-size: 14px;
+}
+
+/* From Uiverse.io by namecho */
+.switch {
+  margin-left: auto;
+  position: relative;
+  display: inline-block;
+  width: 48px; /* 가로 길이 48px */
+  height: 24px; /* 세로 길이 24px */
+}
+
+.switch input[type='checkbox'] {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cccccc;
+  transition: 0.4s;
+  border-radius: 12px; /* 세로 길이의 절반 */
+}
+
+.slider::before {
+  position: absolute;
+  content: '';
+  height: 18px; /* 토글의 높이 18px */
+  width: 18px; /* 토글의 너비 18px */
+  left: 3px; /* 여백 조정 */
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+  background-color: #1c1516;
+}
+
+input:checked + .slider::before {
+  transform: translateX(24px); /* 토글 이동 거리 조정 */
+}

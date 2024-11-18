@@ -1,0 +1,89 @@
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 3vh;
+}
+
+.orangebtn {
+  width: 9rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 16px;
+  background-color: #ff5c17;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.blackbtn {
+  width: 9rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 16px;
+  background-color: #1c1516;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.description {
+  color: #a0a0a0;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 160%;
+  text-align: center;
+  user-select: none;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.contentbox {
+  position: relative;
+  line-height: 160%;
+  width: 100%;
+  min-height: 25vh;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  border: 1px solid #e8e8e8;
+  color: #1c1516;
+  font-size: 0.875rem;
+  user-select: text;
+}
+
+.editbtn {
+  position: absolute;
+  right: 5%;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  width: 60px;
+  border-bottom: 1px solid #a0a0a0;
+}
+
+.edit {
+  color: #a0a0a0;
+  font-size: 0.875rem;
+}
+
+.editbox {
+  line-height: 180%;
+  width: 100%;
+  min-height: 25vh;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  resize: none;
+  border: none;
+  background: rgba(232, 232, 232, 0.2);
+  color: #1c1516;
+  font-family: 'Pretendard';
+  font-size: 0.875rem;
+}
+
+.content {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

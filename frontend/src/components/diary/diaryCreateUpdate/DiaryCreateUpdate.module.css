@@ -1,0 +1,164 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 8vh 7vw;
+}
+
+.backBtn {
+  display: inline-flex;
+  font-size: 14px;
+  color: rgba(160, 160, 160, 1);
+  cursor: pointer;
+  align-items: center;
+}
+
+.titleContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.diaryTitle {
+  font-size: 24px;
+  font-weight: 600;
+  align-self: center;
+  text-align: center;
+  margin: 8vh 0;
+  padding: 1vh 1vw;
+}
+
+.diaryInput {
+  width: 40%;
+  border: none;
+  border-bottom: solid;
+  border-radius: 5px;
+  border-color: rgba(232, 232, 232, 1);
+  background-color: rgba(240, 240, 240, 0.4);
+  outline: none;
+}
+
+.titleErrMsg {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  bottom: 4.2vh;
+  font-size: 12px;
+  color: red;
+}
+
+.submitBtn {
+  width: 14.3125rem;
+  height: 3rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff5c17;
+  margin-bottom: 2rem;
+  font-size: 16px;
+  color: white;
+  align-self: center;
+}
+
+.failBtn {
+  background-color: rgba(232, 232, 232, 1);
+  margin-bottom: 0.5rem;
+}
+
+.errMsg {
+  display: flex;
+  font-size: 12px;
+  color: red;
+  align-items: center;
+  justify-content: center;
+}
+
+.warnIcon {
+  width: 1.5rem;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(28, 21, 22, 0.5); /* 배경색 1C1516, 투명도 50% */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.titleModalContainer {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 30px 28px;
+  max-width: 376px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1c1516;
+  margin-bottom: 8px;
+}
+
+.content {
+  font-size: 0.875rem;
+  color: #a5a5a5;
+  margin-bottom: 16px;
+}
+
+.titleInput {
+  min-width: 90%;
+  border: solid;
+  border-radius: 8px;
+  border-color: rgba(160, 160, 160, 1);
+  padding: 0.4rem;
+  outline: none;
+  margin-bottom: 4vh;
+}
+
+.errorInput {
+  border-color: red;
+}
+
+.actions {
+  margin: 0 auto;
+  gap: 10px;
+}
+
+.cancle {
+  background-color: #f0f0f0;
+  color: #333;
+  width: 155px;
+  padding: 12px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  flex: 1;
+  margin-right: 20px;
+}
+
+.confirm {
+  width: 155px;
+  padding: 12px 0;
+  background-color: #ff5c17;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  flex: 1;
+}
+
+.titleEmpty {
+  position: absolute;
+  top: 56%;
+  left: 28%;
+  font-size: 10px;
+  color: red;
+}

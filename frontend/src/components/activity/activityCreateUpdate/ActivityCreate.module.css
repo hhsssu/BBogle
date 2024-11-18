@@ -1,0 +1,112 @@
+/* 경험 작성 컨테이너 */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 8fr;
+  grid-template-rows: 50px 240px 60px 50px 50px;
+  gap: 10px;
+  margin-top: 7vh;
+  align-items: center;
+}
+
+/* 경험 작성 상단 제목 스타일 */
+.title {
+  margin: 0 auto;
+}
+
+/* 등록하기 버튼 위치 */
+.regist {
+  display: block;
+  margin: 2vh auto;
+}
+
+.failBtn {
+  background-color: rgba(232, 232, 232, 1);
+  margin-bottom: 0.5rem;
+}
+
+.errMsg {
+  display: flex;
+  font-size: 12px;
+  color: red;
+  align-items: center;
+  justify-content: center;
+}
+
+.error {
+  position: absolute;
+  top: 120%;
+  left: 0;
+  font-size: 10px;
+  color: red;
+}
+
+.warnIcon {
+  width: 1.5rem;
+}
+
+/* 경험 제목 */
+.subtitle {
+  border: none;
+  padding: 1vh 1vw;
+  border-bottom: solid 1px #e8e8e8;
+}
+
+/* 경험 내용 박스 */
+.content {
+  resize: none;
+  background: rgba(232, 232, 232, 0.2);
+  border: none;
+  border-radius: 0.625rem;
+  font-family: 'pretendard';
+  font-size: 0.875rem;
+  padding: 1vh 1vw;
+  line-height: 1.6;
+}
+
+/* 셀렉트 형식에 들어갈 스타일 (회색 border) */
+.graybox {
+  border: solid 1px #e8e8e8;
+  padding: 1vh 1vw;
+  font-family: 'pretendard';
+  border-radius: 0.625rem;
+}
+
+/* 경험 기간 설명 (파란 글씨) */
+.datedes {
+  color: #1ea6fc;
+  margin-left: 0.8vw;
+  margin-bottom: 0.5vh;
+  font-size: 0.75rem;
+  font-weight: 600;
+  user-select: none;
+}
+
+/* 기술 키워드 (x버튼을 추가하여 카드에서보다 사이즈 조금 더 큼) */
+.bluekeyword {
+  color: #1ea6fc;
+  background: rgba(30, 166, 252, 0.1);
+  padding: 5px 8px;
+  /* 14px */
+  font-size: 0.875rem;
+  border-radius: 5px;
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
+  user-select: none;
+}
+
+/* 인성 키워드 (x버튼을 추가하여 카드에서보다 사이즈 조금 더 큼) */
+.yellowkeyword {
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+  padding: 5px 8px;
+  /* 14px */
+  font-size: 0.875rem;
+  border-radius: 5px;
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
+  user-select: none;
+}
+
+.margin {
+  margin-right: 3vw;
+}

@@ -1,0 +1,36 @@
+.inputLabel {
+  display: flex;
+  gap: 2vw;
+  align-items: center;
+  margin-bottom: 4vh;
+}
+
+.label {
+  min-width: 140px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.alarmToggleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.toggle {
+  width: 1.875rem;
+  margin-right: 4vw;
+  transition: transform 2s ease;
+}
+
+.timeInput {
+  width: 7rem;
+  border: none;
+  outline: none;
+  font-family: 'Pretendard-regular';
+  font-size: 14px;
+}
+
+.toggleInActive {
+  font-size: 14px;
+  color: rgba(232, 232, 232, 1);
+}

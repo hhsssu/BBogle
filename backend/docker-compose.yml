@@ -1,0 +1,15 @@
+services:
+  backend:
+    image: bbogle-backend:latest
+    environment:
+      - TZ=Asia/Seoul
+    container_name: bbogle-backend
+    networks:
+      - back-network
+    # restart: unless-stopped
+    expose:
+      - "8080"
+
+networks:
+  back-network:
+    external: true

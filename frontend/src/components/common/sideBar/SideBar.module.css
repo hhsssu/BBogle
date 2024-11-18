@@ -1,0 +1,122 @@
+.sidebarContainer {
+  padding: 30px 0;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #1c1516;
+  transition: width 0.3s ease;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1000;
+}
+
+.sidebarContainer.open {
+  width: 200px;
+}
+
+.sidebarContainer.closed {
+  width: 70px;
+}
+
+.openButton {
+  cursor: pointer;
+}
+
+.closeButton {
+  position: fixed;
+  top: 26px;
+  left: 90px;
+  cursor: pointer;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-content: center;
+}
+
+.header {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+}
+
+.open .header {
+  padding: 0 20px;
+}
+
+.smallLogo {
+  height: 35px;
+  cursor: pointer;
+}
+
+.largeLogo {
+  height: 35px;
+  margin-right: auto;
+  cursor: pointer;
+}
+
+.taps {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.closed .taps {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.open .taps {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.mainTaps {
+  width: 100%;
+}
+
+.tap {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+  cursor: pointer;
+}
+
+.open .tap {
+  margin-left: 32px;
+}
+
+.closed .tap {
+  justify-content: center;
+}
+
+.tapDescription {
+  margin-left: 20px;
+  color: white;
+  font-family: 'Pretendard';
+  font-size: 16px;
+}
+
+.active.tapDescription {
+  color: #ff5c17;
+}
+
+.line {
+  width: 70%;
+  margin: 0 auto 40px auto;
+  color: white;
+}
+
+.logout {
+  padding-bottom: 40px;
+  cursor: pointer;
+}

@@ -1,0 +1,163 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+  width: 40vw;
+}
+
+.infoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.pjtTitleContainer {
+  display: flex;
+  align-items: center;
+}
+
+.img {
+  width: 3rem;
+  height: 3rem;
+  border: solid;
+  border-color: #e8e8e8;
+  border-width: 0.2px;
+  border-radius: 100%;
+  margin-right: 10px;
+  overflow: hidden;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.settingBox {
+  position: relative;
+}
+
+.setting {
+  width: 1rem;
+  color: rgba(160, 160, 160, 1);
+}
+
+.status {
+  width: 3rem;
+  height: 1rem;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+}
+
+.statusActive {
+  background-color: rgba(30, 166, 252, 0.1);
+  color: rgba(30, 166, 252, 1);
+}
+
+.statusInActive {
+  background-color: rgba(239, 122, 133, 0.3);
+  color: rgba(255, 92, 23, 1);
+}
+
+.modalBox {
+  position: absolute;
+  top: 40%;
+  left: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.25rem;
+  padding: 0.5625rem 1rem;
+  gap: 0.8rem;
+  border-radius: 0.6rem;
+  box-shadow: 0px 8px 12px 3px #7e7e7e12;
+  background-color: white;
+}
+
+.modalContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.modalImg {
+  width: 1rem;
+}
+
+.description {
+  font-size: 16px;
+  margin-left: 1rem;
+  margin-bottom: 0.2rem;
+  white-space: pre-line;
+  line-height: 140%;
+  overflow: hidden;
+  max-height: none; /* 기본 상태 */
+  transition: max-height 0.3s ease; /* 열고 닫히는 애니메이션 */
+}
+
+.descriptionUnexpand {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 4.2rem; /* 3줄 높이로 제한 (16px * 140% * 3) */
+}
+
+.expandBtn {
+  font-size: 14px;
+  margin-left: 1rem;
+  margin-bottom: 0.6rem;
+  color: #7f7f7f;
+  opacity: 70%;
+}
+
+.term {
+  font-size: 14px;
+  margin-left: 1rem;
+  margin-bottom: 2.25rem;
+  color: rgba(160, 160, 160, 1);
+}
+
+.tagList {
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tagLabel {
+  min-width: 80px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 3.75rem;
+}
+
+.tagSection {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag {
+  min-height: 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  background-color: rgba(30, 166, 252, 0.1);
+  color: rgba(30, 166, 252, 1);
+  border-radius: 5px;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  margin-right: 0.8rem;
+  padding: 0.2rem 0.5rem;
+}

@@ -1,0 +1,72 @@
+.inputLabel {
+  display: flex;
+  gap: 2.6vw;
+  align-items: center;
+  margin-bottom: 4vh;
+}
+
+.label {
+  min-width: 130px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tagSection {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.addTag {
+  width: 1.25rem;
+  stroke: rgba(160, 160, 160, 1);
+}
+
+.tag {
+  min-height: 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  background-color: rgba(30, 166, 252, 0.1);
+  color: rgba(30, 166, 252, 1);
+  border-radius: 5px;
+  margin-right: 0.8rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.close {
+  width: 0.625rem;
+  margin-left: 0.2rem;
+}
+
+.tagInputContainer {
+  display: flex;
+  margin-right: 0.4rem;
+  align-items: center;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
+}
+
+.enterImg {
+  width: 0.75rem;
+}
+
+.tagInput {
+  width: 3rem;
+  height: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  border: solid;
+  border-color: rgba(232, 232, 232, 1);
+  border-width: 0.7px;
+  outline: none;
+  border-radius: 5px;
+  margin-right: 0.4rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}

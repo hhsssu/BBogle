@@ -1,0 +1,97 @@
+/* 전체 컨테이너 */
+.container {
+  height: 80vh;
+}
+
+/* 상단 검색 부분 컨테이너 */
+.searchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 뒤로가기 버튼 */
+.searchContainer > img {
+  cursor: pointer;
+}
+
+/* 검색바 (검색 아이콘 + input) */
+.searchContainer > div {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #1c1516;
+  margin-right: 10px;
+}
+
+/* 검색 input */
+.searchBar {
+  border: none;
+  height: 40px;
+  width: 100%;
+  margin: 0 10px;
+}
+
+/* 검색 버튼 */
+.searchButton {
+  width: 14%;
+  padding: 12px 0;
+  background-color: #1c1516;
+  color: white;
+  border-radius: 14px;
+}
+
+/* 전체 검색 필터 컨테이너 */
+.filterContainer {
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 검색 필터 */
+.filter {
+  display: flex;
+  padding: 5vh 5vw;
+}
+
+/* 검색 필터명 */
+.title {
+  margin-right: 30px;
+  width: 100px;
+  font-weight: 600;
+}
+
+/* 검색 키워드 모음 */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  gap: 8px;
+}
+
+/* 검색 키워드 */
+.tag {
+  display: flex;
+  background-color: #f8f8f8;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* 기술 키워드 active 상태 */
+.skill.active {
+  background-color: #1ea6fc10;
+  color: #1ea6fc;
+}
+
+/* 인성 키워드 active 상태 */
+.kind.active {
+  background-color: #ffc10710;
+  color: #ffc107;
+}
+
+.project.active {
+  background-color: #ff5c1710;
+  color: #ff5c17;
+}

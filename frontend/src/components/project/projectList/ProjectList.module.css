@@ -1,0 +1,89 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 8vh 7vw;
+}
+
+.headerSection {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.pageTitle {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.pjtAddBtn {
+  width: 9rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 16px;
+  background-color: #ff5c17;
+  font-size: 16px;
+  color: white;
+  font-weight: 600;
+}
+
+.pjtSection {
+  height: 50vh;
+}
+
+.checkProgress {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0;
+  background-color: gainsboro;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.checkProgress.active {
+  background-color: #1c1516;
+}
+
+.projectGrid {
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(292px, 1fr));
+  place-items: center;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  gap: 24px 12px;
+  overflow: visible;
+}
+
+.projectGrid::-webkit-scrollbar {
+  display: none;
+}
+
+.emptyPjtContainer {
+  display: flex;
+  height: 60vh;
+  align-items: center;
+  justify-self: center;
+  margin: 0;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  width: 7.5rem;
+}
+
+.emptyTextBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  margin-top: 30px;
+  color: rgba(160, 160, 160, 1);
+}
+
+.boldText {
+  font-weight: 700;
+}

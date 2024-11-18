@@ -1,0 +1,50 @@
+.app-content {
+  flex: 1;
+  transition: margin-left 0.3s ease;
+}
+
+.app-content.open {
+  margin-left: 200px;
+}
+
+.app-content.closed {
+  margin-left: 70px;
+}
+
+.notification {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 312px;
+  background-color: #1c1516;
+  padding: 30px;
+  border-radius: 20px;
+  animation: fadeOut 5s forwards;
+  z-index: 1000;
+}
+
+.notification > h2 {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: white;
+}
+
+.notification > p {
+  font-size: 14px;
+  color: white;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

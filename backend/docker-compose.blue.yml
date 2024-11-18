@@ -1,0 +1,13 @@
+services:
+  backend:
+    image: bbogle-backend:latest
+    container_name: blue-backend
+    networks:
+      - back-network
+    # restart: unless-stopped
+    expose:
+      - "8082"
+
+networks:
+  back-network:
+    external: true

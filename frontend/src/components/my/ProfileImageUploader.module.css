@@ -1,0 +1,117 @@
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.imgContainer {
+  display: flex;
+}
+
+.profile {
+  margin-right: 15px;
+}
+
+.preview {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  background-color: #e0e0e010;
+  font-size: 14px;
+}
+
+.previewImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.downloadButton {
+  position: absolute;
+  left: 103px;
+  top: 107px;
+  cursor: pointer;
+}
+
+.dropZone {
+  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='26' ry='26' stroke='%23FACAB5FF' stroke-width='4' stroke-dasharray='8%2c 14' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+  border-radius: 26px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 100;
+}
+
+.dropZone:hover {
+  background-color: #ff5c1710;
+}
+
+.dropZone > img {
+  width: 40px;
+  height: 44px;
+  margin-bottom: 6px;
+}
+
+.dropZone > p:nth-child(2) {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.dropZone > p:nth-child(3) {
+  font-size: 12px;
+}
+
+.fileInput {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.bottom {
+  display: flex;
+}
+
+.progressBarContainer {
+  width: 74%;
+  height: 10px;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: #ff5c17;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.bottom > button {
+  width: 120px;
+  height: 36px;
+  border-radius: 12px;
+  background-color: #ff5c17;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 14px;
+  margin-left: auto;
+}

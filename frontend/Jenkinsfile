@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Set .ENV File') {
+            steps {
+                dir('frontend') {
+                    withCredentials([file(credentialsId: 'FRONT_ENV_FILE', variable: 'front_env_file')]) {
+                        sh 'cp $front_env_file ./.env'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build --no-cache -t  bbogle-frontend:latest ./frontend'
+
+                }
+            }
+        }
+
+        stage('Depoly') {
+            steps {
+                dir('frontend') {
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+
+        stage('Remove old image') {
+            steps {
+                script {
+                    sh 'docker image prune -f'
+                }
+            }
+        }
+    }
+
+     post {
+        success {
+            script {
+                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                mattermostSend (color: 'good',
+                message: "**빌드 성공** \n _frontend_ \n ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)\n :white_check_mark: ",
+                endpoint: 'https://meeting.ssafy.com/hooks/tcx6yaicaffxufcujwc1qq8qsw',
+                channel: 'B102_Build'
+                )
+            }
+        }
+        failure {
+            script {
+                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                mattermostSend (color: 'danger',
+                message: "**빌드 실패** \n _frontend_ \n ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}/console|Details>)\n :no_entry_sign: ",
+                endpoint: 'https://meeting.ssafy.com/hooks/tcx6yaicaffxufcujwc1qq8qsw',
+                channel: 'B102_Build'
+                )
+            }
+        }
+    }
+}

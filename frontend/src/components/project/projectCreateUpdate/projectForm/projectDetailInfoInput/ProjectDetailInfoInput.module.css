@@ -1,0 +1,85 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  gap: 10px;
+  margin-bottom: 4vh;
+}
+
+.inputLabel {
+  display: flex;
+  gap: 2vw;
+  align-items: center;
+  margin-bottom: 3%;
+}
+
+.label {
+  min-width: 140px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.requiredMark {
+  color: rgba(255, 92, 23, 1);
+  margin-left: 0.2rem;
+}
+
+.termInputContainer {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(133px, 1fr));
+}
+
+.termSection {
+  display: flex;
+  gap: 2vw;
+}
+
+.termError {
+  border-bottom: solid;
+  border-color: red;
+}
+
+.dateWrapper {
+}
+
+.dateLabel {
+  color: #1ea6fc;
+  font-weight: 600;
+  font-size: 12px;
+  margin-left: 0.8vw;
+  margin-bottom: 0.5vh;
+}
+
+.dateInput {
+  min-width: 110px;
+  border: solid 1px #e8e8e8;
+  padding: 1vh 1vw;
+  border-radius: 0.625rem;
+  outline: none;
+  font-family: 'pretendard';
+}
+
+.dateInput::placeholder {
+  color: rgba(232, 232, 232, 1);
+}
+
+.separator {
+  margin-top: 0.6rem;
+}
+
+.error {
+  position: absolute;
+  top: 120%;
+  left: 0;
+  font-size: 10px;
+  color: red;
+}
+
+.selectInput {
+  width: 2rem;
+  border: none;
+  outline: none;
+  appearance: none;
+  text-align: center;
+  font-size: 14px;
+}

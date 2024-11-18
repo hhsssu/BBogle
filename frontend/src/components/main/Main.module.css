@@ -1,0 +1,102 @@
+.container {
+  padding: 8vh 4vw;
+}
+
+.header {
+  width: 30rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto 4vh auto;
+}
+
+.greeting {
+  transform: translateY(-20px);
+  font-weight: 700;
+  font-size: 32px;
+}
+
+.description {
+  margin-bottom: 10px;
+}
+
+.diary > div:nth-child(1) {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mainDescription {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.subDescription {
+  color: #a0a0a0;
+}
+
+.scrollGuide {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.scrollGuide.unvisible {
+  visibility: hidden;
+}
+
+.scroll {
+  height: 40px;
+}
+
+.pjtList {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  gap: 2.1rem;
+  padding-left: 0.1rem;
+  padding: 12px 8px;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  margin: 8vh;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  width: 7vw;
+}
+
+.emptyTextBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  /* margin-top: 30px; */
+  color: rgba(160, 160, 160, 1);
+}
+
+.boldText {
+  font-weight: 700;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  margin-top: 8vh;
+}
+
+.pjtCard.active {
+  border-radius: 1rem;
+  box-shadow: 0 0 0 2px #ff5c17;
+}
+
+.highlight {
+  color: #ff5c17;
+}

@@ -1,0 +1,84 @@
+.container {
+  /* width: 100vw; */
+}
+
+.tabSection {
+  display: flex;
+  justify-content: space-between;
+  padding: 2vh 1vw;
+}
+
+.tabList {
+  display: flex;
+}
+
+.tab {
+  width: 7.8rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(108, 112, 114, 1);
+}
+
+.diaryCnt {
+  width: 1.5rem;
+  height: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: rgba(108, 112, 114, 1);
+  border-radius: 1rem;
+  background-color: rgba(232, 232, 232, 0.5);
+  margin-left: 0.2rem;
+}
+
+.diaryCntActive {
+  color: rgba(255, 92, 23, 1);
+  background-color: rgba(255, 92, 23, 0.1);
+}
+
+.tabActive {
+  font-weight: 600;
+  border-bottom: solid;
+  border-color: rgba(255, 92, 23, 1);
+  color: rgba(255, 92, 23, 1);
+}
+
+.controlContainer {
+  display: flex;
+  align-items: end;
+  gap: 0.8rem;
+}
+
+.sortOptions {
+  display: flex;
+  gap: 1vh;
+  margin-bottom: 0.2rem;
+  cursor: pointer;
+}
+
+.sortActive {
+  font-weight: 600;
+}
+
+.sortInActive {
+  color: rgba(160, 160, 160, 1);
+}
+
+.addDiaryBtn {
+  width: 9rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #ff5c17;
+  font-size: 16px;
+  color: white;
+}
+
+.tabContentSection {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
